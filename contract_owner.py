@@ -2,9 +2,9 @@ class ContractOwner:
     """main class for create contract owner object"""
 
     def __init__(self
-                 ,contract_owner_id: int
-                 ,contract_owner_name: str
-                 ,collection_of_contracts: object = None
+                 , contract_owner_id: int
+                 , contract_owner_name: str
+                 , collection_of_contracts: object = None
                  ):
 
         self.__contract_owner_id = contract_owner_id
