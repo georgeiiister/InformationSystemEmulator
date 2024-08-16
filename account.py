@@ -1,4 +1,5 @@
 class Account:
+    """main class for create account object"""
 
     def __init__(self
                  , account_id: int

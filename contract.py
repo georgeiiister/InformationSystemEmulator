@@ -1,4 +1,5 @@
 class Contract:
+    """main class for create contract object"""
 
     def __init__(self
                  , contract_id: int

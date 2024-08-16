@@ -1,4 +1,5 @@
 class ContractOwner:
+    """main class for create contract owner object"""
 
     def __init__(self
                  ,contract_owner_id: int
