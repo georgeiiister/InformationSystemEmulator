@@ -18,3 +18,11 @@ class Contract:
     @property
     def contract_id(self):
         return self.__contract_id
+
+    @property
+    def collection_of_accounts(self):
+        return self.__collection_of_accounts
+
+    @property
+    def contract_owner(self):
+        return self.__contract_owner
