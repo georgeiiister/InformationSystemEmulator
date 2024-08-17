@@ -7,22 +7,24 @@ class Contract:
 
     def __init__(self
                  ,contract_id: int
-                 ,contract_owner: person.Person|legal_person.LegalPerson
-                 ,collection_of_accounts: account.Collection
+                 ,number: str
+                 ,owner: person.Person|legal_person.LegalPerson
+                 ,accounts: account.Collection
                  ):
 
         self.__contract_id = contract_id
-        self.__collection_of_accounts = collection_of_accounts
-        self.__contract_owner = contract_owner
+        self.__accounts = accounts
+        self.__owner = owner
+        self.__number = number
 
     @property
     def contract_id(self):
         return self.__contract_id
 
     @property
-    def collection_of_accounts(self):
-        return self.__collection_of_accounts
+    def accounts(self):
+        return self.__accounts
 
     @property
-    def contract_owner(self):
-        return self.__contract_owner
+    def owner(self):
+        return self.__owner

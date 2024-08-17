@@ -5,11 +5,11 @@ class Person:
 
     def __init__(self
                  ,person_id: int
-                 ,person_name: str
+                 ,name: str
                  ):
 
         self.__person_id = person_id
-        self.__person_name = person_name
+        self.__name = name
         Person.__count+=1
 
     @property
@@ -17,8 +17,12 @@ class Person:
         return self.__person_id
 
     @property
-    def person_name(self):
-        return self.__person_name
+    def name(self):
+        return self.__name
+
+    @name.setter
+    def name(self, value):
+        self.__name = value
 
     def __del__(self):
         Person.__count -= 1
