@@ -1,5 +1,5 @@
 class LegalPerson:
-    """Main class for create object legal person """
+    """Main class for create object legal person"""
 
     __count = 0
 

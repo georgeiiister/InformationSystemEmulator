@@ -1,5 +1,14 @@
+class AccountError(Exception):
+    pass
+
+class CollectionError(Exception):
+    pass
+
+class AccountNotFoundError(CollectionError):
+    pass
+
 class Account:
-    """Main class for creation object account """
+    """Main class for creation object account"""
     __count = 0
 
     def __init__(self
@@ -11,7 +20,6 @@ class Account:
         self.__number = number
         self.__balance = balance
         Account.__count += 1
-        self.__serial_number = Account.__count
 
     def credit(self,summa: int):
       self.__balance +=summa
@@ -50,19 +58,36 @@ class Collection:
     """main class for creation collection of object account """
     __count = 0
 
-    def __init__(self,account: Account):
-        self.__accounts = set()
-        self.__dict_accounts = dict()
+    def __init__(self
+                 , account: Account
+                 ):
+
+        self.__account_ids = dict()
+        self.__account_numbers = dict()
+        self.__accounts = []
         self.add_account(account = account)
         Collection.__count += 1   # counter of objects
-        self.__serial_number = Collection.__count
 
     def add_account(self,account: Account):
-        self.__accounts.add(account)
-        self.__dict_accounts[account.account_id] = account
+        self.__account_ids[account.account_id] = account
+        self.__account_numbers[account.number] = account
+        self.__accounts.append(account)
 
-    def account(self,account_id: int):
-        return self.__dict_accounts.get(account_id)
+    def account(self, account: int|str):
+        """Account search by account id or account number """
+        result = self.__account_ids.get(account) or self.__account_numbers.get(account)
+        if not result:
+            raise AccountNotFoundError
+        return result
+
+    def account_(self, index: int):
+        """Account search by serial number in collection """
+        result = None
+        try:
+            result = self.__accounts[index]
+        except IndexError:
+            raise AccountNotFoundError
+        return result
 
     @property
     def accounts(self):

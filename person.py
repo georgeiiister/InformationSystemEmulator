@@ -1,5 +1,5 @@
 class Person:
-    """Main class for create object person """
+    """Main class for create object person"""
 
     __count = 0
 
