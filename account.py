@@ -13,6 +13,13 @@ class Account:
         Account.__count+=1
         self.__serial_number=Account.__count
 
+    def credit(self,summa: int):
+      self.__balance+=summa
+
+    def debit(self,summa: int):
+        if self.__balance >= summa:
+            self.__balance-=summa
+
     @property
     def balance(self):
         return self.__balance
@@ -45,13 +52,18 @@ class Collection:
     __count = 0
 
     def __init__(self,account: Account):
-        self.__accounts=set()
-        self.add_account(accounts = account)
+        self.__accounts = set()
+        self.__dict_accounts = dict()
+        self.add_account(account = account)
         Collection.__count += 1   # counter of objects
         self.__serial_number = Collection.__count
 
-    def add_account(self,accounts: Account):
-        self.__accounts.add(accounts)
+    def add_account(self,account: Account):
+        self.__accounts.add(account)
+        self.__dict_accounts[account.account_id] = account
+
+    def get_account(self,account_id: int):
+        return self.__dict_accounts.get(account_id)
 
     @property
     def count_of_accounts(self):
