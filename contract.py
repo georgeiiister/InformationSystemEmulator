@@ -1,6 +1,6 @@
 import account
 import person
-import legal_person
+import legalperson
 
 class Contract:
     """Main class for create object contract"""
@@ -9,7 +9,7 @@ class Contract:
                  ,contract_id: int
                  ,number: str
                  ,owner: person.Person|legal_person.LegalPerson
-                 ,accounts: account.Collection
+                 ,accounts: account.AccountCollection
                  ):
 
         self.__contract_id = contract_id

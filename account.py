@@ -1,6 +1,9 @@
 class AccountError(Exception):
     pass
 
+class RedBalanceError(AccountError):
+    pass
+
 class CollectionError(Exception):
     pass
 
@@ -21,11 +24,13 @@ class Account:
         self.__balance = balance
         Account.__count += 1
 
-    def credit(self,summa: int):
-      self.__balance +=summa
+    def credit(self, amount: int):
+      self.__balance += amount
 
-    def debit(self,summa: int):
-        self.__balance -= summa
+    def debit(self, amount: int):
+        if self.__balance < amount:
+            raise RedBalanceError
+        self.__balance -= amount
 
     @property
     def balance(self):
@@ -54,8 +59,8 @@ class Account:
     def __del__(self):
         Account.__count -= 1
 
-class Collection:
-    """main class for creation collection of object account """
+class AccountCollection:
+    """Main class for creation collection of object account """
     __count = 0
 
     def __init__(self
@@ -66,7 +71,7 @@ class Collection:
         self.__account_numbers = dict()
         self.__accounts = []
         self.add_account(account = account)
-        Collection.__count += 1   # counter of objects
+        AccountCollection.__count += 1   # counter of objects
 
     def add_account(self,account: Account):
         self.__account_ids[account.account_id] = account
@@ -98,7 +103,7 @@ class Collection:
         return len(self.__accounts)
 
     def __del__(self):
-        Collection.__count -= 1
+        AccountCollection.__count -= 1
 
     def __repr__(self):
         return f'Collection(accounts={self.__accounts})'
