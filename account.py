@@ -14,8 +14,13 @@ class AccountNotFoundError(CollectionError):
     pass
 
 
+class Property:
+    pass
+
+
 class Account:
     """Main class for creation object account"""
+
     __count = 0
     __internal_id = 0  # internal counter of account (save value on delete object)
 
@@ -23,12 +28,14 @@ class Account:
                  , account_number: str
                  , balance: int = 0
                  , account_id: int | None = None
-                 , account_collection=None
+                 , account_collection = None
+                 , describe: str | None = None
                  ):
 
         self.__account_id = account_id
         self.__account_number = account_number
         self.__balance = balance
+        self.__describe = describe
         self.__account_collection = account_collection
         Account.__count += 1
         Account.__internal_id += 1
@@ -65,6 +72,14 @@ class Account:
     def account_number(self):
         return self.__account_number
 
+    @property
+    def describe(self):
+        return self.__describe
+
+    @describe.setter
+    def describe(self, value):
+        self.__describe = value
+
     def __hash__(self):
         return hash(self.account_id)
 
@@ -79,31 +94,31 @@ class Account:
     def __del__(self):
         Account.__count -= 1
 
-
-class AccountCollection:
+class Accounts:
     """Main class for creation collection of accounts"""
+
     __count = 0
     __internal_id = 0
     __item_id = 0  # internal number account in collection
 
     def __init__(self
                  , account: Account
-                 , account_collection_id: int | None = None
+                 , accounts_collection_id: int | None = None
                  , primary: bool = False  # add as primary account in collection
                  ):
 
-        self.__account_collection_id = account_collection_id
+        self.__accounts_collection_id = accounts_collection_id
         self.__account_ids = dict()
         self.__account_numbers = dict()
         self.__accounts = dict()
         self.__primary_item_id = None
         self.add_account(account=account, primary=primary)
 
-        AccountCollection.__count += 1
-        AccountCollection.__internal_id += 1
+        Accounts.__count += 1
+        Accounts.__internal_id += 1
 
-        if not self.__account_collection_id:
-            self.__account_collection_id = AccountCollection.__internal_id
+        if not self.__accounts_collection_id:
+            self.__accounts_id = Accounts.__internal_id # add internal id as account collection id
 
     def add_account(self
                     , account: Account
@@ -113,39 +128,47 @@ class AccountCollection:
 
         self.__account_ids[account.account_id] = account
         self.__account_numbers[account.account_number] = account
-        AccountCollection.__item_id += 1
-        self.__accounts[AccountCollection.__item_id] = account
 
-        account.account_collection = self  # set on account link to this collection
+        Accounts.__item_id += 1
+        self.__accounts[Accounts.__item_id] = account
+
+        account.accounts = self  # set on account link to this collection
         if primary:
-            self.__primary_item_id = AccountCollection.__item_id
+            self.__primary_item_id = Accounts.__item_id
 
-    def find_account_by_id(self, account_id: Account.account_id):
-        """Find account by account id"""
-        result = self.__account_ids.get(account_id)
+    def find_account_by_id(self, account_id: Account.account_id)-> Account:
+        """Find account by account id (internal id account)"""
+
+        result: Account = self.__account_ids.get(account_id)
         if not result:
             raise AccountNotFoundError
         return result
 
-    def find_account_by_number(self, account_number: Account.account_number):
+    def find_account_by_number(self, account_number: Account.account_number)-> Account:
         """Find account by account number"""
-        result = self.__account_numbers.get(account_number)
+
+        result: Account = self.__account_numbers.get(account_number)
         if not result:
             raise AccountNotFoundError
         return result
 
-    def find_account_by_item_id(self, item_id: int):
+    def find_account_by_item_id(self, item_id: int)-> Account:
         """Find account by item id in collection"""
-        result = self.__accounts.get(item_id)
+
+        result: Account = self.__accounts.get(item_id)   # work with dictionary accounts
         if not result:
             raise AccountNotFoundError
         return result
 
     @property
-    def primary(self):
+    def primary(self)-> Account:
+        """Method return primary account in collection"""
+
         return self.find_account_by_item_id(item_id=self.__primary_item_id)
 
     def set_primary(self, item_id: int):
+        """Method set primary account in collection"""
+
         result = self.find_account_by_item_id(item_id=item_id)
         if not result:
             raise AccountNotFoundError
@@ -160,10 +183,10 @@ class AccountCollection:
         return len(self.__accounts)
 
     def __del__(self):
-        AccountCollection.__count -= 1
+        Accounts.__count -= 1
 
     def __repr__(self):
         return (f'Collection(accounts={self.__accounts}'
-                f', account_collection_id=({self.__account_collection_id})'
+                f', account_collection_id=({self.__accounts_collection_id})'
                 f', primary_item_id={self.__primary_item_id}'
                 f')')
