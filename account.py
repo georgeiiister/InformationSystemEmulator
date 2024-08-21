@@ -14,10 +14,6 @@ class AccountNotFoundError(AccountsError):
     pass
 
 
-class Property:
-    pass
-
-
 class Account:
     """Main class for creation object account"""
 
@@ -30,6 +26,7 @@ class Account:
                  , account_id: int | None = None
                  , account_collection = None
                  , describe: str | None = None
+                 , account_property = None
                  ):
 
         self.__account_id = account_id
@@ -37,6 +34,7 @@ class Account:
         self.__balance = balance
         self.__describe = describe
         self.__account_collection = account_collection
+        self.__account_property = account_property
         Account.__count += 1
         Account.__internal_id += 1
         self.__internal_id = Account.__internal_id
@@ -80,6 +78,10 @@ class Account:
     def describe(self, value):
         self.__describe = value
 
+    @property
+    def property(self):
+        return self.__account_property
+
     def __hash__(self):
         return hash(self.account_id)
 
@@ -105,6 +107,7 @@ class Accounts:
                  , account: Account
                  , accounts_collection_id: int | None = None
                  , primary: bool = False  # add as primary account in collection
+                 , accounts_property = None
                  ):
 
         self.__accounts_collection_id = accounts_collection_id
@@ -112,6 +115,7 @@ class Accounts:
         self.__account_numbers = dict()
         self.__accounts = dict()
         self.__primary_item_id = None
+        self.__accounts_property = accounts_property
         self.add_account(account=account, primary=primary)
 
         Accounts.__count += 1

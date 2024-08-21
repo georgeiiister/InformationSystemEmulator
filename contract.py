@@ -9,7 +9,7 @@ class Contract:
                  , contract_id: int
                  , number: str
                  , owner: object
-                 , accounts: account.AccountCollection
+                 , accounts: account.Accounts
                  ):
 
         self.__contract_id = contract_id
