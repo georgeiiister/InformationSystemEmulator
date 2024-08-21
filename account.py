@@ -6,11 +6,11 @@ class RedBalanceError(AccountError):
     pass
 
 
-class CollectionError(Exception):
+class AccountsError(Exception):
     pass
 
 
-class AccountNotFoundError(CollectionError):
+class AccountNotFoundError(AccountsError):
     pass
 
 
