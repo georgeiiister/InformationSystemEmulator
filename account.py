@@ -1,8 +1,15 @@
+import datetime
+
+
 class AccountError(Exception):
     pass
 
 
 class RedBalanceError(AccountError):
+    pass
+
+
+class NotSetStartDateOfAction(AccountError):
     pass
 
 
@@ -20,13 +27,15 @@ class Account:
     __count = 0
     __internal_id = 0  # internal counter of account (save value on delete object)
 
-    def __init__(self
-                 , account_number: str
-                 , balance: int = 0
-                 , account_id: int | None = None
-                 , account_collection = None
-                 , describe: str | None = None
-                 , account_property = None
+    def __init__(self,
+                 account_number: str, balance: int = 0,
+                 account_id: int | None = None,
+                 account_collection=None,
+                 describe: str | None = None,
+                 account_property=None,
+                 date_registration=datetime.datetime.now(),
+                 start_date_of_action=None,
+                 state: int = 0
                  ):
 
         self.__account_id = account_id
@@ -35,6 +44,10 @@ class Account:
         self.__describe = describe
         self.__account_collection = account_collection
         self.__account_property = account_property
+        self.__date_registration = date_registration
+        self.__start_date_of_action = start_date_of_action
+        self.__state = state
+
         Account.__count += 1
         Account.__internal_id += 1
         self.__internal_id = Account.__internal_id
@@ -51,11 +64,13 @@ class Account:
         self.__account_collection = value
 
     def credit(self, amount: int):
+        if self.__start_date_of_action is None:
+            raise NotSetStartDateOfAction
         self.__balance += amount
 
     def debit(self, amount: int):
-        if self.__balance < amount:
-            raise RedBalanceError
+        if self.__start_date_of_action is None:
+            raise NotSetStartDateOfAction
         self.__balance -= amount
 
     @property
@@ -79,6 +94,14 @@ class Account:
         self.__describe = value
 
     @property
+    def start_date_of_action(self):
+        return self.__start_date_of_action
+
+    @start_date_of_action.setter
+    def start_date_of_action(self, value):
+        self.__start_date_of_action = value
+
+    @property
     def property(self):
         return self.__account_property
 
@@ -96,6 +119,7 @@ class Account:
     def __del__(self):
         Account.__count -= 1
 
+
 class Accounts:
     """Main class for creation collection of accounts"""
 
@@ -103,11 +127,11 @@ class Accounts:
     __internal_id = 0
     __item_id = 0  # internal number account in collection
 
-    def __init__(self
-                 , account: Account
-                 , accounts_collection_id: int | None = None
-                 , primary: bool = False  # add as primary account in collection
-                 , accounts_property = None
+    def __init__(self,
+                 account: Account,
+                 accounts_collection_id: int | None = None,
+                 primary: bool = False,  # add as primary account in collection, accounts_property=None
+                 accounts_property=None
                  ):
 
         self.__accounts_collection_id = accounts_collection_id
@@ -122,11 +146,11 @@ class Accounts:
         Accounts.__internal_id += 1
 
         if not self.__accounts_collection_id:
-            self.__accounts_id = Accounts.__internal_id # add internal id as account collection id
+            self.__accounts_id = Accounts.__internal_id  # add internal id as account collection id
 
-    def add_account(self
-                    , account: Account
-                    , primary: bool = False  # add as primary account in collection
+    def add_account(self,
+                    account: Account,
+                    primary: bool = False  # add as primary account in collection
                     ):
         """Method for add object account to this account collection"""
 
@@ -136,11 +160,11 @@ class Accounts:
         Accounts.__item_id += 1
         self.__accounts[Accounts.__item_id] = account
 
-        account.accounts = self  # set on account link to this collection
+        account.account_collection = self  # set on account link to this collection
         if primary:
             self.__primary_item_id = Accounts.__item_id
 
-    def find_account_by_id(self, account_id: Account.account_id)-> Account:
+    def find_account_by_id(self, account_id: Account.account_id) -> Account:
         """Find account by account id (internal id account)"""
 
         result: Account = self.__account_ids.get(account_id)
@@ -148,7 +172,7 @@ class Accounts:
             raise AccountNotFoundError
         return result
 
-    def find_account_by_number(self, account_number: Account.account_number)-> Account:
+    def find_account_by_number(self, account_number: Account.account_number) -> Account:
         """Find account by account number"""
 
         result: Account = self.__account_numbers.get(account_number)
@@ -156,16 +180,16 @@ class Accounts:
             raise AccountNotFoundError
         return result
 
-    def find_account_by_item_id(self, item_id: int)-> Account:
+    def find_account_by_item_id(self, item_id: int) -> Account:
         """Find account by item id in collection"""
 
-        result: Account = self.__accounts.get(item_id)   # work with dictionary accounts
+        result: Account = self.__accounts.get(item_id)  # work with dictionary accounts
         if not result:
             raise AccountNotFoundError
         return result
 
     @property
-    def primary(self)-> Account:
+    def primary(self) -> Account:
         """Method return primary account in collection"""
 
         return self.find_account_by_item_id(item_id=self.__primary_item_id)
