@@ -1,5 +1,7 @@
 import datetime
-
+from typing import Union
+from typing import Optional
+from typing import Dict
 
 class AccountError(Exception):
     pass
@@ -24,26 +26,24 @@ class AccountNotFoundError(AccountsError):
 class Account:
     """Main class for creation object account"""
 
-    __count = 0
-    __internal_id = 0  # internal counter of account (save value on delete object)
+    __count: int = 0
+    __internal_id: int = 0  # internal counter of account (save value on delete object)
 
     def __init__(self,
                  account_number: str, balance: int = 0,
-                 account_id: int | None = None,
-                 account_collection=None,
-                 describe: str | None = None,
-                 account_property=None,
-                 date_registration=datetime.datetime.now(),
-                 start_date_of_action=None,
+                 account_id: Optional[int] = None,
+                 account_collection = None,
+                 describe: Optional[str] = None,
+                 date_registration: datetime.date = datetime.datetime.now(),
+                 start_date_of_action: Optional[datetime.date] = None,
                  state: int = 0
-                 ):
+                 ) -> None:
 
         self.__account_id = account_id
         self.__account_number = account_number
         self.__balance = balance
         self.__describe = describe
-        self.__account_collection = account_collection
-        self.__account_property = account_property
+        self.__account_collection: Optional[Accounts] = account_collection
         self.__date_registration = date_registration
         self.__start_date_of_action = start_date_of_action
         self.__state = state
@@ -60,10 +60,10 @@ class Account:
         return self.__account_collection
 
     @account_collection.setter
-    def account_collection(self, value):
+    def account_collection(self, value) -> None:
         self.__account_collection = value
 
-    def credit(self, amount: int):
+    def credit(self, amount: int) -> None:
         if self.__start_date_of_action is None:
             raise NotSetStartDateOfAction
         self.__balance += amount
@@ -101,10 +101,6 @@ class Account:
     def start_date_of_action(self, value):
         self.__start_date_of_action = value
 
-    @property
-    def property(self):
-        return self.__account_property
-
     def __hash__(self):
         return hash(self.account_id)
 
@@ -129,17 +125,15 @@ class Accounts:
 
     def __init__(self,
                  account: Account,
-                 accounts_collection_id: int | None = None,
-                 primary: bool = False,  # add as primary account in collection, accounts_property=None
-                 accounts_property=None
+                 accounts_collection_id: Optional[int] = None,
+                 primary: bool = False  # add as primary account in collection, accounts_property=None
                  ):
 
         self.__accounts_collection_id = accounts_collection_id
-        self.__account_ids = dict()
-        self.__account_numbers = dict()
-        self.__accounts = dict()
-        self.__primary_item_id = None
-        self.__accounts_property = accounts_property
+        self.__account_ids: Dict[Account.account_id, Account] = dict()
+        self.__account_numbers: Dict[Account.account_number, Account] = dict()
+        self.__accounts: Dict[int, Account] = dict()
+        self.__primary_item_id: Optional[int] = None
         self.add_account(account=account, primary=primary)
 
         Accounts.__count += 1
@@ -194,26 +188,26 @@ class Accounts:
 
         return self.find_account_by_item_id(item_id=self.__primary_item_id)
 
-    def set_primary(self, item_id: int):
+    def set_primary(self, item_id: int) -> None:
         """Method set primary account in collection"""
 
-        result = self.find_account_by_item_id(item_id=item_id)
+        result: Account = self.find_account_by_item_id(item_id=item_id)
         if not result:
             raise AccountNotFoundError
         self.__primary_item_id = item_id
 
     @property
-    def accounts(self):
+    def accounts(self) -> Dict[int, Account]:
         return self.__accounts
 
     @property
-    def count(self):
+    def count(self)-> int:
         return len(self.__accounts)
 
-    def __del__(self):
+    def __del__(self) -> None:
         Accounts.__count -= 1
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return (f'Collection(accounts={self.__accounts}'
                 f', account_collection_id=({self.__accounts_collection_id})'
                 f', primary_item_id={self.__primary_item_id}'
