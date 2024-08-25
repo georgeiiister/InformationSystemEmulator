@@ -1,6 +1,7 @@
 import datetime
 from typing import Optional
 from typing import Dict
+from typing import List
 
 class AccountError(Exception):
     pass
@@ -36,7 +37,7 @@ class Account:
                  account_id: Optional[int] = None,
                  account_collection = None,
                  describe: Optional[str] = None,
-                 date_registration: datetime.date = datetime.datetime.now(),
+                 datetime_registration: datetime.date = datetime.datetime.now(),
                  start_date_of_action: Optional[datetime.date] = None
                  ) -> None:
 
@@ -45,7 +46,7 @@ class Account:
         self.__balance = balance
         self.__describe = describe
         self.__account_collection: Optional[Accounts] = account_collection
-        self.__date_registration = date_registration
+        self.__datetime_registration = datetime_registration
         self.__start_date_of_action = start_date_of_action
         self.__state = Account.__new
 
@@ -132,7 +133,7 @@ class Accounts:
         self.__item_id = -1  # internal number account in collection
         self.__accounts_collection_id = accounts_collection_id
         self.__account_ids: Dict[Account.account_id, Account] = dict()
-        self.__account_numbers: Dict[Account.account_number, Account] = dict()
+        self.__account_numbers: list[Account.account_number] = []
         self.__accounts: Dict[int, Account] = dict()
         self.__primary_item_id: Optional[int] = None
         self.add_account(account=account, primary=primary)
@@ -150,7 +151,7 @@ class Accounts:
         """Method for add object account to this account collection"""
 
         self.__account_ids[account.account_id] = account
-        self.__account_numbers[account.account_number] = account
+        self.__account_numbers.append(account.account_number)
 
         self.__item_id += 1
         self.__accounts[self.__item_id] = account
@@ -170,10 +171,7 @@ class Accounts:
     def find_account_by_number(self, account_number: Account.account_number) -> Account:
         """Find account by account number"""
 
-        result: Account = self.__account_numbers.get(account_number)
-        if not result:
-            raise AccountNotFoundError
-        return result
+        raise NotImplemented
 
     def find_account_by_item_id(self, item_id: int) -> Account:
         """Find account by item id in collection"""
@@ -211,5 +209,5 @@ class Accounts:
     def __repr__(self) -> str:
         return (f'Collection(accounts={self.__accounts}'
                 f', account_collection_id=({self.__accounts_collection_id})'
-                f', primary_item_id={self.__primary_item_id}'
+                f', primary={self.__primary_item_id}'
                 f')')
