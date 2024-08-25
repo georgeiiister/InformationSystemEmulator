@@ -1,5 +1,4 @@
 import datetime
-from typing import Union
 from typing import Optional
 from typing import Dict
 
@@ -29,14 +28,16 @@ class Account:
     __count: int = 0
     __internal_id: int = 0  # internal counter of account (save value on delete object)
 
+    __new = 0
+    __active = 1
+
     def __init__(self,
                  account_number: str, balance: int = 0,
                  account_id: Optional[int] = None,
                  account_collection = None,
                  describe: Optional[str] = None,
                  date_registration: datetime.date = datetime.datetime.now(),
-                 start_date_of_action: Optional[datetime.date] = None,
-                 state: int = 0
+                 start_date_of_action: Optional[datetime.date] = None
                  ) -> None:
 
         self.__account_id = account_id
@@ -46,7 +47,7 @@ class Account:
         self.__account_collection: Optional[Accounts] = account_collection
         self.__date_registration = date_registration
         self.__start_date_of_action = start_date_of_action
-        self.__state = state
+        self.__state = Account.__new
 
         Account.__count += 1
         Account.__internal_id += 1
@@ -97,9 +98,9 @@ class Account:
     def start_date_of_action(self):
         return self.__start_date_of_action
 
-    @start_date_of_action.setter
-    def start_date_of_action(self, value):
+    def set_active(self, value = datetime.date.today()):
         self.__start_date_of_action = value
+        self.__state = Account.__active
 
     def __hash__(self):
         return hash(self.account_id)
@@ -121,7 +122,6 @@ class Accounts:
 
     __count = 0
     __internal_id = 0
-    __item_id = 0  # internal number account in collection
 
     def __init__(self,
                  account: Account,
@@ -129,6 +129,7 @@ class Accounts:
                  primary: bool = False  # add as primary account in collection, accounts_property=None
                  ):
 
+        self.__item_id = -1  # internal number account in collection
         self.__accounts_collection_id = accounts_collection_id
         self.__account_ids: Dict[Account.account_id, Account] = dict()
         self.__account_numbers: Dict[Account.account_number, Account] = dict()
@@ -151,12 +152,12 @@ class Accounts:
         self.__account_ids[account.account_id] = account
         self.__account_numbers[account.account_number] = account
 
-        Accounts.__item_id += 1
-        self.__accounts[Accounts.__item_id] = account
+        self.__item_id += 1
+        self.__accounts[self.__item_id] = account
 
         account.account_collection = self  # set on account link to this collection
         if primary:
-            self.__primary_item_id = Accounts.__item_id
+            self.__primary_item_id = self.__item_id
 
     def find_account_by_id(self, account_id: Account.account_id) -> Account:
         """Find account by account id (internal id account)"""
