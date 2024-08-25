@@ -14,6 +14,8 @@ class RedBalanceError(AccountError):
 class NotSetStartDateOfAction(AccountError):
     pass
 
+class NotValidDateActivationError(AccountError):
+    pass
 
 class AccountsError(Exception):
     pass
@@ -38,7 +40,7 @@ class Account:
                  account_collection = None,
                  describe: Optional[str] = None,
                  datetime_registration: datetime.date = datetime.datetime.now(),
-                 start_date_of_action: Optional[datetime.date] = None
+                 activation_date: Optional[datetime.date] = None
                  ) -> None:
 
         self.__account_id = account_id
@@ -47,8 +49,7 @@ class Account:
         self.__describe = describe
         self.__account_collection: Optional[Accounts] = account_collection
         self.__datetime_registration = datetime_registration
-        self.__start_date_of_action = start_date_of_action
-        self.__state = Account.__new
+
 
         Account.__count += 1
         Account.__internal_id += 1
@@ -56,6 +57,12 @@ class Account:
 
         if not self.__account_id:
             self.__account_id = Account.__internal_id
+
+        if activation_date:
+            self.activation(activation_date = activation_date)
+        else:
+            self.__state = Account.__new
+            self.__activation_date = activation_date
 
     @property
     def account_collection(self):
@@ -66,12 +73,12 @@ class Account:
         self.__account_collection = value
 
     def credit(self, amount: int) -> None:
-        if self.__start_date_of_action is None:
+        if self.__activation_date is None:
             raise NotSetStartDateOfAction
         self.__balance += amount
 
     def debit(self, amount: int):
-        if self.__start_date_of_action is None:
+        if self.__activation_date is None:
             raise NotSetStartDateOfAction
         self.__balance -= amount
 
@@ -96,21 +103,31 @@ class Account:
         self.__describe = value
 
     @property
-    def start_date_of_action(self):
-        return self.__start_date_of_action
+    def datetime_registration(self):
+        return self.__datetime_registration
 
-    def set_active(self, value = datetime.date.today()):
-        self.__start_date_of_action = value
+    @property
+    def activation_date(self):
+        return self.__activation_date
+
+    def activation(self, activation_date = datetime.date.today()):
+        if self.datetime_registration>activation_date:
+            raise NotValidDateActivationError
+
+        self.__activation_date = activation_date
         self.__state = Account.__active
 
     def __hash__(self):
         return hash(self.account_id)
 
     def __repr__(self):
-        return (f'Contact(account_id={self.__account_id}'
+        return (f'Account(account_id={self.account_id}'
                 f', balance={self.balance}'
-                f', account_number={self.__account_number}'
+                f', account_number={self.account_number}'
                 f', account_collection={self.account_collection}'
+                f', describe={self.describe}'
+                f', datetime_registration={self.__datetime_registration}'
+                f', activation_date={self.activation_date}'
                 f')'
                 )
 
@@ -130,10 +147,10 @@ class Accounts:
                  primary: bool = False  # add as primary account in collection, accounts_property=None
                  ):
 
-        self.__item_id = -1  # internal number account in collection
+        self.__item_id = None  # internal number account in collection
         self.__accounts_collection_id = accounts_collection_id
         self.__account_ids: Dict[Account.account_id, Account] = dict()
-        self.__account_numbers: list[Account.account_number] = []
+        self.__account_numbers: List[Account.account_number] = []
         self.__accounts: Dict[int, Account] = dict()
         self.__primary_item_id: Optional[int] = None
         self.add_account(account=account, primary=primary)
@@ -153,7 +170,7 @@ class Accounts:
         self.__account_ids[account.account_id] = account
         self.__account_numbers.append(account.account_number)
 
-        self.__item_id += 1
+        self.__item_id = len(self.__account_numbers)-1
         self.__accounts[self.__item_id] = account
 
         account.account_collection = self  # set on account link to this collection
@@ -168,10 +185,17 @@ class Accounts:
             raise AccountNotFoundError
         return result
 
-    def find_account_by_number(self, account_number: Account.account_number) -> Account:
+    def find_account_by_number(self, account_number: Account.account_number) -> List[Account]:
         """Find account by account number"""
-
-        raise NotImplemented
+        result = []
+        item_id: Optional[int] = None
+        try:
+            item_id = self.__account_numbers.index(account_number)
+            result.append(self.find_account_by_item_id(item_id))
+        except ValueError:
+            if not result:
+                raise AccountNotFoundError
+        return result
 
     def find_account_by_item_id(self, item_id: int) -> Account:
         """Find account by item id in collection"""
@@ -209,5 +233,5 @@ class Accounts:
     def __repr__(self) -> str:
         return (f'Collection(accounts={self.__accounts}'
                 f', account_collection_id=({self.__accounts_collection_id})'
-                f', primary={self.__primary_item_id}'
+                f', primary={self.primary}'
                 f')')
