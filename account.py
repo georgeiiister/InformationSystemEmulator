@@ -235,6 +235,13 @@ class Accounts:
     def __del__(self) -> None:
         Accounts.__count -= 1
 
+    def __iter__(self):
+        return iter(self.__accounts.items())
+
+    def __next__(self):
+        for item in self:
+            return item
+
     def __repr__(self) -> str:
         return (f'Collection(accounts={self.__accounts}'
                 f', account_collection_id=({self.__accounts_collection_id})'
