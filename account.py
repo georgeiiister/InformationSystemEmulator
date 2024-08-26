@@ -2,6 +2,7 @@ import datetime
 from typing import Optional
 from typing import Dict
 from typing import List
+from typing import Tuple
 
 class AccountError(Exception):
     pass
@@ -238,7 +239,7 @@ class Accounts:
     def __iter__(self):
         return iter(self.__accounts.items())
 
-    def __next__(self):
+    def __next__(self)->Tuple[int, Account]:
         for item in self:
             return item
 
