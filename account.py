@@ -3,10 +3,10 @@ from typing import Optional
 from typing import Dict
 from typing import List
 from typing import Tuple
+from typing import Iterable
 
 class AccountError(Exception):
     pass
-
 
 class RedBalanceError(AccountError):
     pass
@@ -236,7 +236,7 @@ class Accounts:
     def __del__(self) -> None:
         Accounts.__count -= 1
 
-    def __iter__(self):
+    def __iter__(self) -> Iterable:
         return iter(self.__accounts.items())
 
     def __next__(self)->Tuple[int, Account]:
