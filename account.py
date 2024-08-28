@@ -1,4 +1,6 @@
 import datetime
+import seq
+
 from typing import Optional
 from typing import Dict
 from typing import List
@@ -29,8 +31,9 @@ class AccountNotFoundError(AccountsError):
 class Account:
     """Main class for creation object account"""
 
-    __count: int = 0
-    __internal_id: int = 0  # internal counter of account (save value on delete object)
+    __count = 0
+    __internal_id = 0  # internal counter of account (save value on delete object)
+    __internal_generator_id = seq.Seq()
 
     __new = 0
     __active = 1
@@ -53,7 +56,7 @@ class Account:
 
 
         Account.__count += 1
-        Account.__internal_id += 1
+        Account.__internal_id = next(Account.__internal_generator_id)
         self.__internal_id = Account.__internal_id
 
         if not self.__account_id:
@@ -145,6 +148,7 @@ class Accounts:
 
     __count = 0
     __internal_id = 0
+    __internal_generator_id = seq.Seq()
 
     def __init__(self,
                  account: Account,
@@ -161,10 +165,10 @@ class Accounts:
         self.add_account(account=account, primary=primary)
 
         Accounts.__count += 1
-        Accounts.__internal_id += 1
+        Accounts.__internal_id = next(Accounts.__internal_generator_id)
 
         if not self.__accounts_collection_id:
-            self.__accounts_id = Accounts.__internal_id  # add internal id as account collection id
+            self.__accounts_collection_id = Accounts.__internal_id  # add internal id as account collection id
 
     def add_account(self,
                     account: Account,
