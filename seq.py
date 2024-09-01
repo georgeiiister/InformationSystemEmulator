@@ -6,18 +6,6 @@ class Seq:
     __stop = 100_000_000
     __step = 1
 
-    @classmethod
-    def c_start(cls):
-        return cls.__start
-
-    @classmethod
-    def c_stop(cls):
-        return cls.__stop
-
-    @classmethod
-    def c_step(cls):
-        return cls.__step
-
     def __init__(self
                  , start: Optional[int] = None
                  , stop: Optional[int] = None
@@ -25,15 +13,15 @@ class Seq:
                  ):
 
         if start is None:
-            start = Seq.c_start()
+            start = Seq.__start
         self.__start = start
 
         if stop is None:
-            stop = Seq.c_stop()
+            stop = Seq.__stop
         self.__stop = stop
 
         if step is None:
-            step = Seq.c_step()
+            step = Seq.__step
         self.__step = step
 
         self.__val = None
