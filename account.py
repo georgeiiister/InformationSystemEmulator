@@ -114,7 +114,10 @@ class Account:
     def activation_datetime(self):
         return self.__activation_datetime
 
-    def activation(self, activation_datetime = datetime.datetime.now()):
+    def activation(self, activation_datetime:Optional[datetime.datetime]):
+        if activation_datetime is None:
+            activation_datetime = datetime.datetime.now()
+
         if self.registration_datetime > activation_datetime:
             raise NotValidDateActivationError
 
