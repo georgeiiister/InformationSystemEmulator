@@ -23,15 +23,9 @@ class File:
         return next(cls.__file_id)
 
     def __init__(self, path=None, size_of_dumping:int=None):
-        if path is None:
-            path = f'{File.home_path}{os.sep}information_system.file{File.get_file_id()}'
-        self.path = path
-
+        self.__path = path or f'{File.home_path}{os.sep}information_system.file{File.get_file_id()}'
         self.__text = []
-
-        if size_of_dumping is None:
-            size_of_dumping = File.__size_of_dumping
-        self.size_of_dumping = size_of_dumping
+        self.__size_of_dumping = size_of_dumping or File.__size_of_dumping
 
     @property
     def size_of_dumping(self):
