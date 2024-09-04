@@ -30,6 +30,12 @@ class CollectionNumber(Collection):
     def deep_sum(self):
         return self.__deep_sum or self.__calculate_deep_sum()
 
+    def min_max(self):
+        return min(self.value), max(self.value)
+
+    def deep_min_max(self):
+        raise NotImplemented #DOIT
+
     def __calculate_deep_sum(self,value:Optional[int] = None):
         value = value or self.value
         for item in value:
