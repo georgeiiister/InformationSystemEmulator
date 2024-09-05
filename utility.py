@@ -4,20 +4,38 @@ from typing import Optional
 class Collection:
     def __init__(self,value: Union[list,tuple,str]):
         self.__value = value
+        self.__item = None
+        self.__count = 0
+        self.__count_item = None
+        self.__histogram = dict()
 
     @property
     def value(self):
         return self.__value
 
+    @value.setter
+    def value(self,value):
+        self.__value = value
+        self.__item = None
+        self.__count = None
+        self.__count_item = None
+        self.__histogram = dict()
+
     def count(self, item: Optional = None):
         if item:
+            if item == self.__item:
+                return self.__count_item
             try:
-                histogram = {i: self.value.count(item) for i in self.value}
-                return histogram.get(item,0)
+                if not self.__histogram:
+                    self.__histogram = {i: self.value.count(item) for i in self.value}
+                self.__count_item = self.__histogram.get(item,0)
+                return self.__count_item
             except TypeError:
-                return len(tuple((i for i in self.value if i == item)))
+                self.__count_item = len(tuple((i for i in self.value if i == item)))
+                return self.__count_item
         else:
-            return len(self.__value)
+            self.__count = self.__count or len(self.__value)
+            return self.__count
 
     def __len__(self):
         return self.count()
@@ -30,7 +48,7 @@ class CollectionNumber(Collection):
     def deep_sum(self):
         return self.__deep_sum or self.__calculate_deep_sum()
 
-    def min_max(self):
+    def min_max(self)->Optional[tuple]:
         return min(self.value), max(self.value)
 
     def deep_min_max(self):
