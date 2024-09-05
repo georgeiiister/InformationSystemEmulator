@@ -10,11 +10,11 @@ class Collection:
         self.__histogram = dict()
 
     @property
-    def value(self):
+    def collection_value(self):
         return self.__value
 
-    @value.setter
-    def value(self,value):
+    @collection_value.setter
+    def collection_value(self, value):
         self.__value = value
         self.__item = None
         self.__count = None
@@ -27,11 +27,11 @@ class Collection:
                 return self.__count_item
             try:
                 if not self.__histogram:
-                    self.__histogram = {i: self.value.count(item) for i in self.value}
+                    self.__histogram = {i: self.collection_value.count(item) for i in self.collection_value}
                 self.__count_item = self.__histogram.get(item,0)
                 return self.__count_item
             except TypeError:
-                self.__count_item = len(tuple((i for i in self.value if i == item)))
+                self.__count_item = len(tuple((i for i in self.collection_value if i == item)))
                 return self.__count_item
         else:
             self.__count = self.__count or len(self.__value)
@@ -45,17 +45,20 @@ class CollectionNumber(Collection):
         Collection.__init__(self,value=value)
         self.__deep_sum = 0
 
+    @property
     def deep_sum(self):
         return self.__deep_sum or self.__calculate_deep_sum()
 
+    @property
     def min_max(self)->Optional[tuple]:
-        return min(self.value), max(self.value)
+        return min(self.collection_value), max(self.collection_value)
 
+    @property
     def deep_min_max(self):
         raise NotImplemented #DOIT
 
     def __calculate_deep_sum(self,value:Optional[int] = None):
-        value = value or self.value
+        value = value or self.collection_value
         for item in value:
             try:
                 self.__deep_sum = self.__calculate_deep_sum(item)
