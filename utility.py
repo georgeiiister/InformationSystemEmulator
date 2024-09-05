@@ -8,6 +8,7 @@ class Collection:
         self.__count = 0
         self.__count_item = None
         self.__histogram = dict()
+        self.__min_max = 0
 
     @property
     def collection_value(self):
@@ -20,6 +21,7 @@ class Collection:
         self.__count = None
         self.__count_item = None
         self.__histogram = dict()
+        self.__min_max = (None,None)
 
     def count(self, item: Optional = None):
         if item:
@@ -40,6 +42,15 @@ class Collection:
     def __len__(self):
         return self.count()
 
+    @property
+    def min_max(self) -> Optional[tuple]:
+        self.__min_max = self.__min_max or min(self.collection_value), max(self.collection_value)
+        return self.__min_max
+
+    @property
+    def deep_min_max(self):
+        raise NotImplemented  # DOIT
+
 class CollectionNumber(Collection):
     def __init__(self,value:Union[list[int],tuple[int]]):
         Collection.__init__(self,value=value)
@@ -48,14 +59,6 @@ class CollectionNumber(Collection):
     @property
     def deep_sum(self):
         return self.__deep_sum or self.__calculate_deep_sum()
-
-    @property
-    def min_max(self)->Optional[tuple]:
-        return min(self.collection_value), max(self.collection_value)
-
-    @property
-    def deep_min_max(self):
-        raise NotImplemented #DOIT
 
     def __calculate_deep_sum(self,value:Optional[int] = None):
         value = value or self.collection_value
