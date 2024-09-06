@@ -11,8 +11,7 @@ class PositiveNumberDumpingError(FileError):
 
 
 class File:
-    __file_id = seq.Seq()
-    __size_of_dumping = 100_000
+    __file_id = seq.Seq(seq_name='file')
 
     @staticmethod
     def home_path():
@@ -22,10 +21,25 @@ class File:
     def get_file_id(cls):
         return next(cls.__file_id)
 
-    def __init__(self, path=None, size_of_dumping:int=None):
+    def __init__(self, path=None):
         self.__path = path or f'{File.home_path}{os.sep}information_system.file{File.get_file_id()}'
+
+    @property
+    def path(self):
+        return self.__path
+
+    @path.setter
+    def path(self, value):
+        self.__path = value
+
+
+class TextFile(File):
+    __size_of_dumping = 100_000
+
+    def __init__(self, path=None, size_of_dumping:int=None):
+        File.__init__(self,path=path)
         self.__text = []
-        self.__size_of_dumping = size_of_dumping or File.__size_of_dumping
+        self.__size_of_dumping = size_of_dumping or TextFile.__size_of_dumping
 
     @property
     def size_of_dumping(self):
@@ -36,14 +50,6 @@ class File:
         if value < 0:
             raise PositiveNumberDumpingError
         self.__size_of_dumping = value
-
-    @property
-    def path(self):
-        return self.__path
-
-    @path.setter
-    def path(self, value):
-        self.__path = value
 
     @property
     def view_rows(self):
@@ -71,8 +77,7 @@ class File:
         if clear:
             self.__text.clear()
 
-
-class Log(File):
+class Log(TextFile):
 
     __sep = '^'
 
@@ -81,10 +86,10 @@ class Log(File):
         return f'log{datetime.datetime.now()}_{File.get_file_id()}.log'
 
     def __init__(self):
-        File.__init__(self, path=f'{File.home_path()}{os.sep}{Log.__make_name()}')
+        TextFile.__init__(self, path=f'{TextFile.home_path()}{os.sep}{Log.__make_name()}')
 
     def append(self, value):
-        File.append(self, value=f'{datetime.datetime.now()}{Log.__sep}{value}')
+        TextFile.append(self, value=f'{datetime.datetime.now()}{Log.__sep}{value}')
 
     def dumping(self, mode='a+',sep='\n', end='\n', clear=True):
-        File.dumping(self,mode=mode,sep=sep, end=end, clear=clear)
+        TextFile.dumping(self,mode=mode,sep=sep, end=end, clear=clear)

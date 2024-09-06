@@ -1,5 +1,6 @@
 import datetime
 import seq
+import pickle
 
 from typing import Optional
 from typing import Dict
@@ -33,7 +34,7 @@ class Account:
 
     __count = 0
     __internal_id = 0  # internal counter of account (save value on delete object)
-    __internal_generator_id = seq.Seq()
+    __internal_generator_id = seq.Seq(seq_name='account')
 
     __new = 0
     __active = 1
@@ -144,13 +145,17 @@ class Account:
     def __del__(self):
         Account.__count -= 1
 
+    @property
+    def pickle(self):
+        return self.account_id, pickle.dumps(self)
+
 
 class Accounts:
     """Main class for creation collection of accounts"""
 
     __count = 0
     __internal_id = 0
-    __internal_generator_id = seq.Seq()
+    __internal_generator_id = seq.Seq(seq_name='accounts')
 
     def __init__(self,
                  account: Account,
@@ -254,3 +259,11 @@ class Accounts:
                 f', account_collection_id=({self.__accounts_collection_id})'
                 f', primary={self.primary}'
                 f')')
+
+    @property
+    def accounts_collection_id(self):
+        return self.__accounts_collection_id
+
+    @property
+    def pickle(self):
+        return self.__accounts_collection_id, pickle.dumps(self)
