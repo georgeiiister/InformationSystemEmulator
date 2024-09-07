@@ -14,6 +14,10 @@ class File:
     __file_id = seq.Seq(seq_name='file')
 
     @staticmethod
+    def os_sep():
+        return os.sep
+
+    @staticmethod
     def home_path():
         return pathlib.Path(os.path.expanduser('~'))
 

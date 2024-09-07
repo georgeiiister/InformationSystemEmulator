@@ -1,5 +1,10 @@
-def main():
-    pass
+import environment
 
-if __name__=='__main__':
+
+def main():
+    env = environment.Environment()
+    print(env.path2program)
+
+
+if __name__ == '__main__':
     main()
