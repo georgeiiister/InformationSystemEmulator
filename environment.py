@@ -1,11 +1,18 @@
-import setting
-import file
+from setting import InitialSettings
+from setting import SystemSettings
+
+from file import File
 import pathlib
+import os
 
 class Environment:
     def __init__(self):
-        self.__initial_settings = setting.InitialSettings()
-        self.__system_setting = setting.SystemSettings()
+        self.__initial_settings = InitialSettings()
+        self.__system_setting = SystemSettings()
+
+    @property
+    def initial_settings(self):
+        return self.__initial_settings
 
     @property
     def program_name(self):
@@ -13,6 +20,13 @@ class Environment:
 
     @property
     def path2program(self):
-        #return pathlib.file.File.home_path()+os.sep+self.__initial_settings.directory_name_of_program
-        raise NotImplemented
+        return pathlib.Path(f'{File.home_dir()}'
+                            f'{os.sep}'
+                            f'{self.initial_settings.path_to_working_files_of_system}')
+
+    @property
+    def path2db(self):
+        return pathlib.Path(f'{File.home_dir()}'
+                            f'{os.sep}'
+                            f'{self.initial_settings.path_to_db_files_of_system}')
 

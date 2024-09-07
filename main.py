@@ -1,10 +1,11 @@
 import environment
 
+def create_environment():
+    env = environment.Environment()
+    print(env.path2db)
 
 def main():
-    env = environment.Environment()
-    print(env.path2program)
-
+    create_environment()
 
 if __name__ == '__main__':
     main()

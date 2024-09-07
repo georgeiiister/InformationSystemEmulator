@@ -14,19 +14,21 @@ class File:
     __file_id = seq.Seq(seq_name='file')
 
     @staticmethod
-    def os_sep():
-        return os.sep
+    def home_dir():
+        return os.path.expanduser('~')
 
     @staticmethod
     def home_path():
-        return pathlib.Path(os.path.expanduser('~'))
+        return pathlib.Path(File.home_dir())
 
     @classmethod
     def get_file_id(cls):
         return next(cls.__file_id)
 
     def __init__(self, path=None):
-        self.__path = path or f'{File.home_path}{os.sep}information_system.file{File.get_file_id()}'
+        self.__path = path or (f'{File.home_path}'
+                               f'{os.sep}'
+                               f'File{File.get_file_id()}')
 
     @property
     def path(self):
