@@ -1,12 +1,18 @@
-import pathlib
 import os
 import seq
 import datetime
+import json
+
 
 class FileError(Exception):
     pass
 
+
 class PositiveNumberDumpingError(FileError):
+    pass
+
+
+class FileNotExistsError(FileError):
     pass
 
 
@@ -17,16 +23,12 @@ class File:
     def home_dir():
         return os.path.expanduser('~')
 
-    @staticmethod
-    def home_path():
-        return pathlib.Path(File.home_dir())
-
     @classmethod
     def get_file_id(cls):
         return next(cls.__file_id)
 
     def __init__(self, path=None):
-        self.__path = path or (f'{File.home_path}'
+        self.__path = path or (f'{File.home_dir}'
                                f'{os.sep}'
                                f'File{File.get_file_id()}')
 
@@ -38,12 +40,55 @@ class File:
     def path(self, value):
         self.__path = value
 
+    def exists(self, raise_error=True):
+        result = os.path.exists(self.path)
+        if raise_error and result:
+            raise FileNotExistsError
+        return result
+
+
+class JsonFile(File):
+    def __init__(self, path=None):
+        File.__init__(self, path=path)
+        self.__value = None
+
+    def __load(self):
+        self.exists()
+        with open(self.path, 'r') as jf:
+            self.__value = json.load(jf)
+        return self.__value
+
+    @property
+    def json(self):
+        self.__value = self.__value or self.__load()
+        return self.__value
+
+    @json.setter
+    def json(self, value):
+        self.__value = value
+
+    def get_by_key(self,key):
+        return self.json.get(key)
+
+    def set_by_key(self,key,value):
+        self.json = self.json[key]=value
+
+    def dump(self):
+        self.exists()
+        with open(self.path, 'w') as jf:
+            json.dump(self.__value, jf, indent=4)
+
+
+class SettingFile(JsonFile):
+    def __init__(self, path=None):
+        JsonFile.__init__(self, path=path or 'setting.json')
+
 
 class TextFile(File):
     __size_of_dumping = 100_000
 
-    def __init__(self, path=None, size_of_dumping:int=None):
-        File.__init__(self,path=path)
+    def __init__(self, path=None, size_of_dumping: int = None):
+        File.__init__(self, path=path)
         self.__text = []
         self.__size_of_dumping = size_of_dumping or TextFile.__size_of_dumping
 
@@ -74,17 +119,18 @@ class TextFile(File):
         self.__text.clear()
 
     def __write_immediate(self, value, mode='a+', end=''):
+        self.exists()
         with open(self.path, mode) as fl:
             fl.write(f'{value}{end}')
 
-    def dumping(self, mode='a+',sep='', end='', clear=True):
+    def dumping(self, mode='a+', sep='', end='', clear=True):
         text = sep.join(self.view_rows)
         self.__write_immediate(value=text, mode=mode, end=end)
         if clear:
             self.__text.clear()
 
-class Log(TextFile):
 
+class LogFile(TextFile):
     __sep = '^'
 
     @classmethod
@@ -92,10 +138,10 @@ class Log(TextFile):
         return f'log{datetime.datetime.now()}_{File.get_file_id()}.log'
 
     def __init__(self):
-        TextFile.__init__(self, path=f'{TextFile.home_path()}{os.sep}{Log.__make_name()}')
+        TextFile.__init__(self, path=f'{TextFile.home_dir()}{os.sep}{Log.__make_name()}')
 
     def append(self, value):
         TextFile.append(self, value=f'{datetime.datetime.now()}{Log.__sep}{value}')
 
-    def dumping(self, mode='a+',sep='\n', end='\n', clear=True):
-        TextFile.dumping(self,mode=mode,sep=sep, end=end, clear=clear)
+    def dumping(self, mode='a+', sep='\n', end='\n', clear=True):
+        TextFile.dumping(self, mode=mode, sep=sep, end=end, clear=clear)
