@@ -1,10 +1,23 @@
-import os
+class ReferenceSetting:
+    __setting = {
+                "global_debug": True,
+                "program_name": ["information", "system", "emulator"],
+                "path_to_working_files_of_system": 'ISE_WorkingFiles',
+                "path_to_db_files_of_system": 'ISE_DB'
+                }
+    def __init__(self):
+        self.__value = ReferenceSetting.__setting
+
+    @property
+    def value(self):
+        return self.__value
 
 class InitialSettings:
-    def __init__(self):
-        self.__program_name = ('information', 'system', 'emulator')
-        self.__path_to_working_files_of_system = f'{os.path.expanduser("~")}{os.sep}ISE_WorkingFiles'
-        self.__path_to_db_files_of_system = f'{self.__path_to_working_files_of_system}{os.sep}ISE_DB'
+    def __init__(self,setting_file):
+
+        self.__program_name = settings.get('program_name')
+        self.__path_to_working_files_of_system = settings.get('path_to_working_files_of_system')
+        self.__path_to_db_files_of_system = settings.get('path_to_db_files_of_system')
 
     @property
     def program_name(self):
@@ -21,8 +34,8 @@ class InitialSettings:
 
 class SystemSettings:
     def __init__(self):
-        self.__file_name_of_sequence='seq'
-        self.__file_name_of_account='account'
+        self.__file_name_of_sequence = 'seq'
+        self.__file_name_of_account = 'account'
 
     @property
     def file_name_of_sequence(self):

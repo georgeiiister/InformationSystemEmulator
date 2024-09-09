@@ -2,6 +2,7 @@ import os
 import seq
 import datetime
 import json
+import setting
 
 
 class FileError(Exception):
@@ -27,9 +28,8 @@ class File:
     def get_file_id(cls):
         return next(cls.__file_id)
 
-    def __init__(self, path=None):
-        self.__path = path or (f'{File.home_dir()}'
-                               f'File{File.get_file_id()}')
+    def __init__(self, path):
+        self.__path = path
 
     @property
     def path(self):
@@ -89,8 +89,23 @@ class JsonFile(File):
 
 
 class SettingFile(JsonFile):
+    __setting_file_name = 'setting.json'
+
+    @classmethod
+    def setting_file_name(cls):
+        return cls.__setting_file_name
+
     def __init__(self, path=None):
-        JsonFile.__init__(self, path=path or 'setting.json')
+        JsonFile.__init__(self, path=path)
+        if path:
+            self.exists()
+        else:
+            self.path = JsonFile.home_dir() + SettingFile.setting_file_name()
+            self.__ref_init()
+
+    def __ref_init(self):
+        self.value = setting.ReferenceSetting().value
+        self.dump()
 
 
 class TextFile(File):
