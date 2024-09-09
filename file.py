@@ -40,13 +40,13 @@ class File:
         self.__path = value
 
     @property
-    def dir_name(self):
-        """get directory of file"""
+    def dir(self):
+        """Get directory of file"""
         return os.path.dirname(self.path)
 
     def mkdir(self, name):
-        """create subdirectory"""
-        os.mkdir(self.dir_name+os.sep+name)
+        """Create subdirectory"""
+        os.mkdir(self.dir+os.sep+name)
 
     def exists(self, raise_error=True):
         result = os.path.exists(self.path)
@@ -67,25 +67,25 @@ class JsonFile(File):
         return self.__value
 
     @property
-    def json(self):
+    def value(self):
         self.__value = self.__value or self.__load()
         return self.__value
 
-    @json.setter
-    def json(self, value):
+    @value.setter
+    def value(self, value):
         self.__value = value
 
     def get_by_key(self,key):
-        return self.json.get(key)
+        return self.value.get(key)
 
     def set_by_key(self,key,value):
-        result = self.json[key]=value
-        self.json[key]=result
+        result = self.value[key]=value
+        self.value[key]=result
 
     def dump(self,mode='w'):
         self.exists()
-        with open(self.path, mode=mode) as jf:
-            json.dump(self.__value, jf, indent=4)
+        with open(self.path, mode=mode) as fl:
+            json.dump(self.__value, fl, indent=4)
 
 
 class SettingFile(JsonFile):
