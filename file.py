@@ -21,15 +21,14 @@ class File:
 
     @staticmethod
     def home_dir():
-        return os.path.expanduser('~')
+        return f'{os.path.expanduser("~")}{os.sep}'
 
     @classmethod
     def get_file_id(cls):
         return next(cls.__file_id)
 
     def __init__(self, path=None):
-        self.__path = path or (f'{File.home_dir}'
-                               f'{os.sep}'
+        self.__path = path or (f'{File.home_dir()}'
                                f'File{File.get_file_id()}')
 
     @property
@@ -40,9 +39,18 @@ class File:
     def path(self, value):
         self.__path = value
 
+    @property
+    def dir_name(self):
+        """get directory of file"""
+        return os.path.dirname(self.path)
+
+    def mkdir(self, name):
+        """create subdirectory"""
+        os.mkdir(self.dir_name+os.sep+name)
+
     def exists(self, raise_error=True):
         result = os.path.exists(self.path)
-        if raise_error and result:
+        if raise_error and not result:
             raise FileNotExistsError
         return result
 
@@ -71,11 +79,12 @@ class JsonFile(File):
         return self.json.get(key)
 
     def set_by_key(self,key,value):
-        self.json = self.json[key]=value
+        result = self.json[key]=value
+        self.json[key]=result
 
-    def dump(self):
+    def dump(self,mode='w'):
         self.exists()
-        with open(self.path, 'w') as jf:
+        with open(self.path, mode=mode) as jf:
             json.dump(self.__value, jf, indent=4)
 
 
@@ -137,11 +146,11 @@ class LogFile(TextFile):
     def __make_name(cls):
         return f'log{datetime.datetime.now()}_{File.get_file_id()}.log'
 
-    def __init__(self):
-        TextFile.__init__(self, path=f'{TextFile.home_dir()}{os.sep}{Log.__make_name()}')
+    def __init__(self,path=None):
+        TextFile.__init__(self, path = path or f'{TextFile.home_dir()}{LogFile.__make_name()}')
 
     def append(self, value):
-        TextFile.append(self, value=f'{datetime.datetime.now()}{Log.__sep}{value}')
+        TextFile.append(self, value=f'{datetime.datetime.now()}{LogFile.__sep}{value}')
 
     def dumping(self, mode='a+', sep='\n', end='\n', clear=True):
         TextFile.dumping(self, mode=mode, sep=sep, end=end, clear=clear)
