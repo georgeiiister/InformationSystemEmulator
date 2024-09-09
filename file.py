@@ -83,7 +83,6 @@ class JsonFile(File):
         self.value[key]=result
 
     def dump(self,mode='w'):
-        self.exists()
         with open(self.path, mode=mode) as fl:
             json.dump(self.__value, fl, indent=4)
 
@@ -97,14 +96,16 @@ class SettingFile(JsonFile):
 
     def __init__(self, path=None):
         JsonFile.__init__(self, path=path)
-        if path:
+        if self.path:
             self.exists()
         else:
-            self.path = JsonFile.home_dir() + SettingFile.setting_file_name()
-            self.__ref_init()
+            self.path = SettingFile.setting_file_name() #working directory
+            if not self.exists(raise_error=False):
+                self.path = JsonFile.home_dir() + SettingFile.setting_file_name()
+                self.__ref_init()
 
     def __ref_init(self):
-        self.value = setting.ReferenceSetting().value
+        self.value = setting.ReferenceSetting().value #get reference value
         self.dump()
 
 

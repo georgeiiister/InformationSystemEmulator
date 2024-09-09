@@ -1,5 +1,6 @@
 from setting import InitialSettings
 from setting import SystemSettings
+from setting import SystemDebug
 
 from file import File
 import pathlib
@@ -9,6 +10,7 @@ class Environment:
     def __init__(self):
         self.__initial_settings = InitialSettings()
         self.__system_setting = SystemSettings()
+        self.__system_debug = SystemDebug()
 
     @property
     def initial_settings(self):
