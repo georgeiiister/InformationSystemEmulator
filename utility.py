@@ -60,6 +60,25 @@ class Collection:
     def vector_tuple(self):
         return self.__collection_tuple or self.__value2vector_tuple()
 
+    @property
+    def b_sort_vector_tuple(self):
+        result = []
+        for item in self.vector_tuple:
+            if result:
+                for i, r_item in enumerate(result):
+                    if item <= r_item:
+                        result.insert(i, item)
+                        break
+                else:
+                    result.append(item)
+            else:
+                result.append(item)
+        self.__collection_tuple = result
+        return self.__collection_tuple
+
+    def q_sort_vector_tuple(self):
+        self.__collection_tuple = tuple(sorted(self.vector_tuple))
+
     def __value2vector_tuple(self,value:Union[list,tuple,str] = None):
         value = value or self.collection_value
         for item in value:

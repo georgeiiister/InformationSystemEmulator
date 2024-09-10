@@ -144,7 +144,6 @@ class TextFile(File):
         self.__text.clear()
 
     def __write_immediate(self, value, mode='a+', end=''):
-        self.exists()
         with open(self.path, mode) as fl:
             fl.write(f'{value}{end}')
 

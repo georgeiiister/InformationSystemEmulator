@@ -24,7 +24,6 @@ class NotValidDateActivationError(AccountError):
 class AccountsError(Exception):
     pass
 
-
 class AccountNotFoundError(AccountsError):
     pass
 
@@ -194,7 +193,7 @@ class Accounts:
             self.__primary_item_id = self.__item_id
 
     def find_account_by_id(self, account_id: Account.account_id) -> Account:
-        """Find account by account id (internal id account)"""
+        """Find account by internal id account"""
 
         result: Account = self.__account_ids.get(account_id)
         if not result:
