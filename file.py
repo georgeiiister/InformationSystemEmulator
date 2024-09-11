@@ -25,7 +25,7 @@ class File:
         return f'{os.path.expanduser("~")}{os.sep}'
 
     @classmethod
-    def get_file_id(cls):
+    def get_id(cls):
         return next(cls.__file_id)
 
     def __init__(self, path):
@@ -128,7 +128,7 @@ class TextFile(File):
         self.__size_of_dumping = value
 
     @property
-    def view_rows(self):
+    def view(self):
         return self.__text
 
     def append(self, value):
@@ -138,7 +138,7 @@ class TextFile(File):
 
     @property
     def count_of_rows(self):
-        return len(self.view_rows)
+        return len(self.view)
 
     def clearing(self):
         self.__text.clear()
@@ -148,7 +148,7 @@ class TextFile(File):
             fl.write(f'{value}{end}')
 
     def dumping(self, mode='a+', sep='', end='', clear=True):
-        text = sep.join(self.view_rows)
+        text = sep.join(self.view)
         self.__write_immediate(value=text, mode=mode, end=end)
         if clear:
             self.__text.clear()
@@ -159,7 +159,7 @@ class LogFile(TextFile):
 
     @classmethod
     def __make_name(cls):
-        return f'log{datetime.datetime.now()}_{File.get_file_id()}.log'
+        return f'log{datetime.datetime.now()}_{File.get_id()}.log'
 
     def __init__(self,path=None):
         TextFile.__init__(self, path = path or f'{TextFile.home_dir()}{LogFile.__make_name()}')
