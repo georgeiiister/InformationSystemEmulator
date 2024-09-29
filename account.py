@@ -213,6 +213,19 @@ class Accounts:
                 raise AccountNotFoundError
         return result
 
+    def __getitem__(self, item):
+        """Find account by account number"""
+        result = []
+        item_id: Optional[int] = -1
+        try:
+            while True:
+                item_id = self.__account_numbers.index(item, item_id + 1)
+                result.append(self.find_account_by_item_id(item_id))
+        except ValueError:
+            if not result:
+                raise AccountNotFoundError
+        return result
+
     def find_account_by_item_id(self, item_id: int) -> Account:
         """Find account by item id in collection"""
 
