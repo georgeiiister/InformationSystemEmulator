@@ -168,6 +168,7 @@ class Accounts:
         self.__account_numbers: List[Account.account_number] = []
         self.__accounts: Dict[int, Account] = dict()
         self.__primary_item_id: Optional[int] = None
+        self.__count = 0
         self.add_account(account=account, primary=primary)
 
         Accounts.__count += 1
@@ -187,6 +188,8 @@ class Accounts:
 
         self.__item_id = len(self.__account_numbers)-1
         self.__accounts[self.__item_id] = account
+
+        self.__count+=1
 
         account.account_collection = self  # set on account link to this collection
         if primary:
@@ -253,8 +256,8 @@ class Accounts:
         return self.__accounts
 
     @property
-    def count(self)-> int:
-        return len(self.__accounts)
+    def __len__(self)-> int:
+        return self.__count
 
     def __del__(self) -> None:
         Accounts.__count -= 1
