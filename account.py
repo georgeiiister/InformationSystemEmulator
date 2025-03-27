@@ -327,7 +327,7 @@ class Accounts:
     def __iter__(self) -> Iterable:
         return iter(self.__accounts.items())
 
-    def __next__(self) -> Tuple[int, Account]:
+    def __next__(self):
         for item in self:
             return item
 
