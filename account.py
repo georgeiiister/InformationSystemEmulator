@@ -13,15 +13,36 @@ class AccountError(Exception):
     pass
 
 
-class RedBalanceError(AccountError):
+class BalanceError(AccountError):
     pass
 
 
-class NotSetStartDateOfAction(AccountError):
+class RedBalanceError(BalanceError):
+    pass
+
+class BalanceIsNotZero(BalanceError):
+    pass
+
+class DateAccountError(AccountError):
+    pass
+
+class DateActivationError(DateAccountError):
+    pass
+
+class NotSetDateBeginOfAction(DateActivationError):
+    pass
+
+class NotValidDateActivationError(DateActivationError):
     pass
 
 
-class NotValidDateActivationError(AccountError):
+class DateCloseError(DateAccountError):
+    pass
+
+class NotValidDateCloseError(DateCloseError):
+    pass
+
+class StateError(AccountError):
     pass
 
 
@@ -40,8 +61,12 @@ class Account:
     __internal_id = 0  # internal counter of account (save value on delete object)
     __internal_generator_id = seq.Seq(seq_name='account')
 
-    __new = 0
-    __active = 1
+    __states = {'__new': 0,
+                '__active': 1,
+                '__locked': 2,
+                '__closed': 3,
+                '__deleted': 4
+                }
 
     def __init__(self,
                  account_number: str = None,
@@ -58,6 +83,7 @@ class Account:
         self.__describe = describe
         self.__account_collection: Optional[Accounts] = account_collection
         self.__registration_datetime = registration_datetime
+        self.__close_datetime = None
 
         Account.__count += 1
         Account.__internal_id = next(Account.__internal_generator_id)
@@ -71,7 +97,7 @@ class Account:
         if activation_datetime is not None:
             self.activation(activation_datetime=activation_datetime)
         else:
-            self.__state = Account.__new
+            self.__state = Account.__states.get('__new')
             self.__activation_datetime = activation_datetime
 
         self.__lock = False
@@ -86,12 +112,12 @@ class Account:
 
     def credit(self, amount: int) -> None:
         if self.activation_datetime is None:
-            raise NotSetStartDateOfAction
+            raise NotSetDateBeginOfAction
         self.__balance += amount
 
     def debit(self, amount: int):
         if self.activation_datetime is None:
-            raise NotSetStartDateOfAction
+            raise NotSetDateBeginOfAction
         self.__balance -= amount
 
     @property
@@ -122,14 +148,31 @@ class Account:
     def activation_datetime(self):
         return self.__activation_datetime
 
-    def activation(self, activation_datetime: Optional[datetime.datetime] = None):
+    def activation(self, activation_datetime:Optional[datetime.datetime] = None):
         activation_datetime = activation_datetime or datetime.datetime.now()
 
         if self.registration_datetime > activation_datetime:
             raise NotValidDateActivationError
 
         self.__activation_datetime = activation_datetime
-        self.__state = Account.__active
+        self.__state = Account.__states.get('__active')
+
+    def close(self, close_datetime: Optional[datetime.datetime] = None):
+        close_datetime = close_datetime or datetime.datetime.now()
+
+        if self.registration_datetime > close_datetime:
+            raise NotValidDateCloseError
+
+        if self.balance != 0:
+            raise BalanceIsNotZero
+
+        state_closed = Account.__states.get('__closed')
+
+        if self.__states == state_closed:
+            raise StateError
+
+        self.__close_datetime = close_datetime
+        self.__state = Account.__states.get('__closed')
 
     @property
     def state(self):
@@ -146,6 +189,7 @@ class Account:
                 f', describe={self.describe}'
                 f', registration_datetime={self.registration_datetime}'
                 f', activation_datetime={self.activation_datetime}'
+                f', close_datetime={self.__close_datetime}'
                 f')'
                 )
 
@@ -177,7 +221,7 @@ class Accounts:
     def __init__(self,
                  account: Account,
                  accounts_collection_id: Optional[int] = None,
-                 primary: bool = False  # add as primary account in collection, accounts_property=None
+                 primary: bool = False  # add as primary account in collection
                  ):
 
         self.__item_id = None  # internal number account in collection
@@ -300,3 +344,7 @@ class Accounts:
     @property
     def pickle(self):
         return self.__accounts_collection_id, pickle.dumps(self)
+
+    def close(self):
+        for item_id in self.__accounts:
+            self.__accounts.get(item_id).close()
