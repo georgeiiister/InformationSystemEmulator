@@ -12,12 +12,17 @@ class ReferenceSetting:
     def value(self):
         return self.__value
 
-class InitialSettings:
-    def __init__(self,setting_file):
+    def setting(self, setting_name):
+        return self.__value.get(setting_name)
 
-        self.__program_name = settings.get('program_name')
-        self.__path_to_working_files_of_system = settings.get('path_to_working_files_of_system')
-        self.__path_to_db_files_of_system = settings.get('path_to_db_files_of_system')
+class InitialSettings:
+    def __init__(self,setting_file=None):
+        self.__reference_setting = ReferenceSetting()
+        self.__program_name = self.__reference_setting.setting(setting_name = 'program_name')
+        self.__path_to_working_files_of_system = self.__reference_setting.setting(setting_name =
+                                                                                  'path_to_working_files_of_system')
+        self.__path_to_db_files_of_system = self.__reference_setting.setting(setting_name =
+                                                                             'path_to_db_files_of_system')
 
     @property
     def program_name(self):
