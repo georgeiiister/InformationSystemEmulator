@@ -8,8 +8,10 @@ from typing import List
 from typing import Tuple
 from typing import Iterable
 
+
 class AccountError(Exception):
     pass
+
 
 class RedBalanceError(AccountError):
     pass
@@ -18,11 +20,14 @@ class RedBalanceError(AccountError):
 class NotSetStartDateOfAction(AccountError):
     pass
 
+
 class NotValidDateActivationError(AccountError):
     pass
 
+
 class AccountsError(Exception):
     pass
+
 
 class AccountNotFoundError(AccountsError):
     pass
@@ -39,9 +44,10 @@ class Account:
     __active = 1
 
     def __init__(self,
-                 account_number: str, balance: int = 0,
+                 account_number: str,
+                 balance: int = 0,
                  account_id: Optional[int] = None,
-                 account_collection = None,
+                 account_collection=None,
                  describe: Optional[str] = None,
                  registration_datetime: datetime.datetime = datetime.datetime.now(),
                  activation_datetime: Optional[datetime.datetime] = None
@@ -54,7 +60,6 @@ class Account:
         self.__account_collection: Optional[Accounts] = account_collection
         self.__registration_datetime = registration_datetime
 
-
         Account.__count += 1
         Account.__internal_id = next(Account.__internal_generator_id)
         self.__internal_id = Account.__internal_id
@@ -63,10 +68,12 @@ class Account:
             self.__account_id = Account.__internal_id
 
         if activation_datetime is not None:
-            self.activation(activation_datetime = activation_datetime)
+            self.activation(activation_datetime=activation_datetime)
         else:
             self.__state = Account.__new
             self.__activation_datetime = activation_datetime
+
+        self.__lock = False
 
     @property
     def account_collection(self):
@@ -114,7 +121,7 @@ class Account:
     def activation_datetime(self):
         return self.__activation_datetime
 
-    def activation(self, activation_datetime:Optional[datetime.datetime]=None):
+    def activation(self, activation_datetime: Optional[datetime.datetime] = None):
         activation_datetime = activation_datetime or datetime.datetime.now()
 
         if self.registration_datetime > activation_datetime:
@@ -148,6 +155,15 @@ class Account:
     def pickle(self):
         return self.account_id, pickle.dumps(self)
 
+    def __enter__(self):
+        self.__lock = True
+
+    def __exit__(self, exc_type=None, exc_val=None, exc_tb=None):
+        self.__lock = False
+
+    @property
+    def lock(self):
+        return self.__lock
 
 class Accounts:
     """Main class for creation collection of accounts"""
@@ -186,10 +202,10 @@ class Accounts:
         self.__account_ids[account.account_id] = account
         self.__account_numbers.append(account.account_number)
 
-        self.__item_id = len(self.__account_numbers)-1
+        self.__item_id = len(self.__account_numbers) - 1
         self.__accounts[self.__item_id] = account
 
-        self.__count+=1
+        self.__count += 1
 
         account.account_collection = self  # set on account link to this collection
         if primary:
@@ -209,7 +225,7 @@ class Accounts:
         item_id: Optional[int] = -1
         try:
             while True:
-                item_id = self.__account_numbers.index(account_number, item_id+1)
+                item_id = self.__account_numbers.index(account_number, item_id + 1)
                 result.append(self.find_account_by_item_id(item_id))
         except ValueError:
             if not result:
@@ -256,7 +272,7 @@ class Accounts:
         return self.__accounts
 
     @property
-    def __len__(self)-> int:
+    def __len__(self) -> int:
         return self.__count
 
     def __del__(self) -> None:
@@ -265,7 +281,7 @@ class Accounts:
     def __iter__(self) -> Iterable:
         return iter(self.__accounts.items())
 
-    def __next__(self)->Tuple[int, Account]:
+    def __next__(self) -> Tuple[int, Account]:
         for item in self:
             return item
 
