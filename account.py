@@ -166,6 +166,7 @@ class Account:
     def lock(self):
         return self.__lock
 
+
 class Accounts:
     """Main class for creation collection of accounts"""
 
