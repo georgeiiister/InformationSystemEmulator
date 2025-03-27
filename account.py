@@ -44,7 +44,7 @@ class Account:
     __active = 1
 
     def __init__(self,
-                 account_number: str,
+                 account_number: str = None,
                  balance: int = 0,
                  account_id: Optional[int] = None,
                  account_collection=None,
@@ -54,7 +54,6 @@ class Account:
                  ) -> None:
 
         self.__account_id = account_id
-        self.__account_number = account_number
         self.__balance = balance
         self.__describe = describe
         self.__account_collection: Optional[Accounts] = account_collection
@@ -66,6 +65,8 @@ class Account:
 
         if not self.__account_id:
             self.__account_id = Account.__internal_id
+
+        self.__account_number = account_number or f'account_number{self.__account_id}'
 
         if activation_datetime is not None:
             self.activation(activation_datetime=activation_datetime)
