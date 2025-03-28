@@ -52,6 +52,12 @@ class AccountsError(Exception):
 class AccountNotFoundError(AccountsError):
     pass
 
+class AccountDeleteFromCollectionError(AccountsError):
+    pass
+
+class DeletePrimaryAccount(AccountDeleteFromCollectionError):
+    pass
+
 
 class Account:
     """Main class for creation object account"""
@@ -61,9 +67,9 @@ class Account:
     __internal_generator_id = seq.Seq(seq_name='account')
 
     __states = {'__new': 0,
-                '__active': 1,
-                '__locked': 2,
-                '__closed': 3,
+                '__active':  1,
+                '__locked':  2,
+                '__closed':  3,
                 '__deleted': 4
                 }
 
@@ -71,7 +77,6 @@ class Account:
                  account_number: str = None,
                  balance: int = 0,
                  account_id: Optional[int] = None,
-                 account_collection=None,
                  describe: Optional[str] = None,
                  registration_datetime: datetime.datetime = datetime.datetime.now(),
                  activation_datetime: Optional[datetime.datetime] = None
@@ -80,9 +85,10 @@ class Account:
         self.__account_id = account_id
         self.__balance = balance
         self.__describe = describe
-        self.__account_collection: Optional[Accounts] = account_collection
         self.__registration_datetime = registration_datetime
         self.__close_datetime = None
+        self.__account_collection = None
+        self.__id_account_in_collection = None
 
         Account.__count += 1
         Account.__internal_id = next(Account.__internal_generator_id)
@@ -105,9 +111,15 @@ class Account:
     def account_collection(self):
         return self.__account_collection
 
-    @account_collection.setter
-    def account_collection(self, value) -> None:
+    @property
+    def id_account_in_collection(self):
+        return self.id_account_in_collection
+
+    def account_collection_and_id_account_in_collection(self,
+                                                        value,
+                                                        id_account_in_collection) -> None:
         self.__account_collection = value
+        self.__id_account_in_collection = id_account_in_collection
 
     def credit(self, amount: int) -> None:
         if self.activation_datetime is None:
@@ -213,9 +225,8 @@ class Account:
 class Accounts:
     """Main class for creation collection of accounts"""
 
-    __count = 0
-    __internal_id = 0
     __internal_generator_id = seq.Seq(seq_name='accounts')
+    __internal_generator_account_id = seq.Seq(seq_name='account')
 
     def __init__(self,
                  account: Account,
@@ -223,20 +234,18 @@ class Accounts:
                  primary: bool = False  # add as primary account in collection
                  ):
 
-        self.__item_id = None  # internal number account in collection
-        self.__accounts_collection_id = accounts_collection_id
-        self.__account_ids: Dict[Account.account_id, Account] = dict()
-        self.__account_numbers: List[Account.account_number] = []
+        self.__collection_id = accounts_collection_id
+        self.__accounts_by_id: Dict[Account.account_id, Account] = dict()
+        self.__accounts_numbers: List[Account.account_number] = []  # list only number of account
         self.__accounts: Dict[int, Account] = dict()
         self.__primary_item_id: Optional[int] = None
-        self.__count = 0
+
         self.add_account(account=account, primary=primary)
 
-        Accounts.__count += 1
-        Accounts.__internal_id = next(Accounts.__internal_generator_id)
+        self.__internal_id = next(Accounts.__internal_generator_id)
 
-        if not self.__accounts_collection_id:
-            self.__accounts_collection_id = Accounts.__internal_id  # add internal id as account collection id
+        if not self.__collection_id:
+            self.__accounts_collection_id = self.__internal_id  # add internal id as account collection id
 
     def add_account(self,
                     account: Account,
@@ -244,25 +253,42 @@ class Accounts:
                     ):
         """Method for add object account to this account collection"""
 
-        self.__account_ids[account.account_id] = account
-        self.__account_numbers.append(account.account_number)
+        self.__accounts_by_id[account.account_id] = account
+        self.__accounts_numbers.append(account.account_number)
 
-        self.__item_id = len(self.__account_numbers) - 1
-        self.__accounts[self.__item_id] = account
-
-        self.__count += 1
-
-        account.account_collection = self  # set on account link to this collection
+        item_id = next(Accounts.__internal_generator_account_id)
+        self.__accounts[item_id] = account
         if primary:
-            self.__primary_item_id = self.__item_id
+            self.__primary_item_id = item_id
+
+        # set on account link to this collection
+        account.account_collection_and_id_account_in_collection(value = self,
+                                                                id_account_in_collection = item_id)
 
     def find_account_by_id(self, account_id: Account.account_id) -> Account:
         """Find account by internal id account"""
 
-        result: Account = self.__account_ids.get(account_id)
+        result: Account = self.__accounts_by_id.get(account_id)
         if not result:
             raise AccountNotFoundError
         return result
+
+    def __del_account_by_id(self,
+                            account_id: Account.account_id
+                            ):
+        account: Account = self.find_account_by_id(account_id = account_id)
+        self.__del_account_by_item_id(item_id = account.id_account_in_collection)
+
+    def __del_account_by_item_id(self, item_id: int):
+        account: Account = self.find_account_by_item_id(item_id = item_id)
+
+        if account == self.primary:
+            raise DeletePrimaryAccount
+
+        del self.__accounts_by_id[account.account_id]
+        account.account_collection_and_id_account_in_collection(value = None,
+                                                                id_account_in_collection = None
+                                                                )
 
     def find_account_by_number(self, account_number: Account.account_number) -> List[Account]:
         """Find account by account number"""
@@ -270,7 +296,7 @@ class Accounts:
         item_id: Optional[int] = -1
         try:
             while True:
-                item_id = self.__account_numbers.index(account_number, item_id + 1)
+                item_id = self.__accounts_numbers.index(account_number, item_id + 1)
                 result.append(self.find_account_by_item_id(item_id))
         except ValueError:
             if not result:
@@ -283,7 +309,7 @@ class Accounts:
         item_id: Optional[int] = -1
         try:
             while True:
-                item_id = self.__account_numbers.index(item, item_id + 1)
+                item_id = self.__accounts_numbers.index(item, item_id + 1)
                 result.append(self.find_account_by_item_id(item_id))
         except ValueError:
             if not result:
@@ -318,10 +344,10 @@ class Accounts:
 
     @property
     def __len__(self) -> int:
-        return self.__count
+        raise NotImplemented
 
-    def __del__(self) -> None:
-        Accounts.__count -= 1
+    def __del__(self, account_id) -> None:
+        self.__del_account_by_id(account_id = account_id)
 
     def __iter__(self) -> Iterable:
         return iter(self.__accounts.items())
