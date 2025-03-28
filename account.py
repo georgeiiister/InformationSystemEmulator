@@ -19,17 +19,22 @@ class BalanceError(AccountError):
 class RedBalanceError(BalanceError):
     pass
 
+
 class BalanceIsNotZero(BalanceError):
     pass
+
 
 class DateAccountError(AccountError):
     pass
 
+
 class DateActivationError(DateAccountError):
     pass
 
+
 class NotSetDateBeginOfAction(DateActivationError):
     pass
+
 
 class NotValidDateActivationError(DateActivationError):
     pass
@@ -38,8 +43,10 @@ class NotValidDateActivationError(DateActivationError):
 class DateCloseError(DateAccountError):
     pass
 
+
 class NotValidDateCloseError(DateCloseError):
     pass
+
 
 class StateError(AccountError):
     pass
@@ -52,8 +59,10 @@ class AccountsError(Exception):
 class AccountNotFoundError(AccountsError):
     pass
 
+
 class AccountDeleteFromCollectionError(AccountsError):
     pass
+
 
 class DeletePrimaryAccount(AccountDeleteFromCollectionError):
     pass
