@@ -1,6 +1,7 @@
 import datetime
 import seq
 import pickle
+from decimal import Decimal
 
 from typing import Optional
 from typing import Dict
@@ -75,16 +76,28 @@ class Account:
     __internal_id = 0  # internal counter of account (save value on delete object)
     __internal_generator_id = seq.Seq(seq_name='account')
 
-    __states = {'__new': 0,
-                '__active':  1,
-                '__locked':  2,
-                '__closed':  3,
-                '__deleted': 4
+    __state_new = 0
+    __state_active =  1
+    __state_locked =  2
+    __state_closed =  3
+    __state_deleted = 4
+
+    @classmethod
+    def states(cls) -> dict:
+        return  {  cls.__state_new:     'new'
+                 , cls.__state_active:  'active'
+                 , cls.__state_locked:  'locked'
+                 , cls.__state_closed:  'closed'
+                 , cls.__state_deleted: 'deleted'
                 }
+
+    @classmethod
+    def state_name(cls, state_id)->str:
+        return cls.states().get(state_id)
 
     def __init__(self,
                  account_number: str = None,
-                 balance: int = 0,
+                 balance: Decimal = Decimal('0'),
                  account_id: Optional[int] = None,
                  describe: Optional[str] = None,
                  registration_datetime: datetime.datetime = datetime.datetime.now(),
@@ -111,7 +124,7 @@ class Account:
         if activation_datetime is not None:
             self.activation(activation_datetime=activation_datetime)
         else:
-            self.__state = Account.__states.get('__new')
+            self.__state_id = Account.__state_new
             self.__activation_datetime = activation_datetime
 
         self.__lock = False
@@ -131,12 +144,12 @@ class Account:
         self.__collection = value
         self.__id_in_collection = id_in_collection
 
-    def credit(self, amount: int) -> None:
+    def credit(self, amount: Decimal) -> None:
         if self.activation_datetime is None:
             raise NotSetDateBeginOfAction
         self.__balance += amount
 
-    def debit(self, amount: int):
+    def debit(self, amount: Decimal):
         if self.activation_datetime is None:
             raise NotSetDateBeginOfAction
         self.__balance -= amount
@@ -178,7 +191,7 @@ class Account:
             raise NotValidDateActivationError
 
         self.__activation_datetime = activation_datetime
-        self.__state = Account.__states.get('__active')
+        self.__state_id = Account.__state_active
 
     def close(self,
               close_datetime: Optional[datetime.datetime] = None
@@ -191,17 +204,28 @@ class Account:
         if self.balance != 0:
             raise BalanceIsNotZero
 
-        state_closed = Account.__states.get('__closed')
 
-        if self.__states == state_closed:
+        if self.__state_id == Account.__state_closed:
             raise StateError
 
         self.__close_datetime = close_datetime
-        self.__state = Account.__states.get('__closed')
+        self.__state_id = Account.__state_closed
 
     @property
     def state(self):
-        return self.__state
+        return self.__state_id
+
+    @property
+    def pickle(self):
+        return self.account_id, pickle.dumps(self)
+
+    @property
+    def lock(self):
+        return self.__lock
+
+    @property
+    def active(self):
+        return Account.__state_active == self.__state_id
 
     def __hash__(self):
         return hash(self.account_id)
@@ -210,6 +234,7 @@ class Account:
         return (f'Account(account_id={self.account_id}'
                 f', balance={self.balance}'
                 f', account_number={self.account_number}'
+                f', state_id={self.__state_id}'
                 f', account_collection={self.collection}'
                 f', describe={self.describe}'
                 f', registration_datetime={self.registration_datetime}'
@@ -221,19 +246,12 @@ class Account:
     def __del__(self):
         Account.__count -= 1
 
-    @property
-    def pickle(self):
-        return self.account_id, pickle.dumps(self)
-
     def __enter__(self):
         self.__lock = True
 
     def __exit__(self, exc_type=None, exc_val=None, exc_tb=None):
         self.__lock = False
 
-    @property
-    def lock(self):
-        return self.__lock
 
 
 class Accounts:
