@@ -8,7 +8,8 @@ from decimal import Decimal
 acc_pool = tuple((account.Account() for i in range(100)))
 
 #activing of accounts
-for account in acc_pool[:int(len(acc_pool)/2)+1]:
+active_acc = slice(0,int(len(acc_pool)/2)+1)
+for account in acc_pool[active_acc]:
     account.activation()
 
 for account in acc_pool:
@@ -16,5 +17,3 @@ for account in acc_pool:
         amount:Decimal = Decimal(str(round(random.randint(1,10_000) * random.random(),2)))
         account.credit(amount = amount)
         print(f'{account.balance:>5}')
-
-

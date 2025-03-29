@@ -82,6 +82,12 @@ class Account:
     __state_closed =  3
     __state_deleted = 4
 
+    __active_account =  'a'
+    __passive_account = 'p'
+    __active_passive_account = 'ap'
+
+
+
     @classmethod
     def states(cls) -> dict:
         return  {  cls.__state_new:     'new'
@@ -89,6 +95,14 @@ class Account:
                  , cls.__state_locked:  'locked'
                  , cls.__state_closed:  'closed'
                  , cls.__state_deleted: 'deleted'
+                }
+
+    @classmethod
+    def category_of_account(cls) -> dict:
+        return {
+                  cls.__active_account:         'active'
+                , cls.__passive_account:        'passive'
+                , cls.__active_passive_account: 'active_passive'
                 }
 
     @classmethod
