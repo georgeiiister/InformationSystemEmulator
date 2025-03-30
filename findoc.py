@@ -1,5 +1,6 @@
 import account
 
+from decimal import Decimal
 
 class FinDocError:
     pass
@@ -24,9 +25,9 @@ class FinDoc:
 
     def __init__(self
                  , debit_account: account.Account
-                 , debit_amount: int
+                 , debit_amount: Decimal
                  , credit_account: account.Account
-                 , credit_amount: int
+                 , credit_amount: Decimal
                  ):
         self.__debit_account = debit_account
         self.__debit_amount = debit_amount

@@ -1,12 +1,12 @@
 import datetime
 import seq
 import pickle
-from decimal import Decimal
 
 from typing import Optional
 from typing import Dict
 from typing import List
 from typing import Iterable
+from decimal import Decimal
 
 
 class AccountError(Exception):
@@ -25,11 +25,11 @@ class BalanceIsNotZero(BalanceError):
     pass
 
 
-class DateAccountError(AccountError):
+class ActivationError(AccountError):
     pass
 
 
-class DateActivationError(DateAccountError):
+class DateActivationError(ActivationError):
     pass
 
 
@@ -41,7 +41,11 @@ class NotValidDateActivationError(DateActivationError):
     pass
 
 
-class DateCloseError(DateAccountError):
+class CloseError(AccountError):
+    pass
+
+
+class DateCloseError(CloseError):
     pass
 
 
@@ -50,6 +54,10 @@ class NotValidDateCloseError(DateCloseError):
 
 
 class StateError(AccountError):
+    pass
+
+
+class CategoryOfAccountError(AccountError):
     pass
 
 
@@ -90,7 +98,8 @@ class Account:
 
     @classmethod
     def states(cls) -> dict:
-        return  {  cls.__state_new:     'new'
+        return  {
+                   cls.__state_new:     'new'
                  , cls.__state_active:  'active'
                  , cls.__state_locked:  'locked'
                  , cls.__state_closed:  'closed'
@@ -109,13 +118,15 @@ class Account:
     def state_name(cls, state_id)->str:
         return cls.states().get(state_id)
 
-    def __init__(self,
-                 account_number: str = None,
-                 balance: Decimal = Decimal('0'),
-                 account_id: Optional[int] = None,
-                 describe: Optional[str] = None,
-                 registration_datetime: datetime.datetime = datetime.datetime.now(),
-                 activation_datetime: Optional[datetime.datetime] = None
+    def __init__(
+                   self
+                 , account_number: str = None
+                 , category:int = None
+                 , balance: Decimal = Decimal('0')
+                 , account_id: Optional[int] = None
+                 , describe: Optional[str] = None
+                 , registration_datetime: datetime.datetime = datetime.datetime.now()
+                 , activation_datetime: Optional[datetime.datetime] = None
                  ) -> None:
 
         self.__account_id = account_id
@@ -125,6 +136,7 @@ class Account:
         self.__close_datetime = None
         self.__collection = None
         self.__id_in_collection = None
+        self.__lock = False
 
         Account.__count += 1
         Account.__internal_id = next(Account.__internal_generator_id)
@@ -141,7 +153,11 @@ class Account:
             self.__state_id = Account.__state_new
             self.__activation_datetime = activation_datetime
 
-        self.__lock = False
+        if category is None:
+            self.__category = Account.__passive_account
+
+        if Account.category_of_account().get(self.__category) is None:
+            raise CategoryOfAccountError
 
     @property
     def collection(self):
@@ -151,10 +167,7 @@ class Account:
     def id_in_collection(self):
         return self.__id_in_collection
 
-    def set_collection(self,
-                       value,
-                       id_in_collection
-                       ) -> None:
+    def set_collection(self, value, id_in_collection) -> None:
         self.__collection = value
         self.__id_in_collection = id_in_collection
 
@@ -166,6 +179,9 @@ class Account:
     def debit(self, amount: Decimal):
         if self.activation_datetime is None:
             raise NotSetDateBeginOfAction
+        if self.__balance < amount and self.__category == Account.__passive_account:
+            raise RedBalanceError
+
         self.__balance -= amount
 
     @property
@@ -196,8 +212,9 @@ class Account:
     def activation_datetime(self):
         return self.__activation_datetime
 
-    def activation(self,
-                   activation_datetime:Optional[datetime.datetime] = None
+    def activation(
+                     self
+                   , activation_datetime:Optional[datetime.datetime] = None
                    ):
         activation_datetime = activation_datetime or datetime.datetime.now()
 
@@ -207,8 +224,9 @@ class Account:
         self.__activation_datetime = activation_datetime
         self.__state_id = Account.__state_active
 
-    def close(self,
-              close_datetime: Optional[datetime.datetime] = None
+    def close(
+                self
+              , close_datetime: Optional[datetime.datetime] = None
               ):
         close_datetime = close_datetime or datetime.datetime.now()
 
@@ -217,7 +235,6 @@ class Account:
 
         if self.balance != 0:
             raise BalanceIsNotZero
-
 
         if self.__state_id == Account.__state_closed:
             raise StateError
@@ -245,7 +262,8 @@ class Account:
         return hash(self.account_id)
 
     def __repr__(self):
-        return (f'Account(account_id={self.account_id}'
+        return (
+                f'Account(account_id={self.account_id}'
                 f', balance={self.balance}'
                 f', account_number={self.account_number}'
                 f', state_id={self.__state_id}'
@@ -267,7 +285,6 @@ class Account:
         self.__lock = False
 
 
-
 class Accounts:
     """Main class for creation collection of accounts"""
 
@@ -286,21 +303,15 @@ class Accounts:
         self.__accounts: Dict[int, Account] = dict()
         self.__primary_item_id: Optional[int] = None
 
-        self.add_account(account=account,
-                         primary=primary
-                         )
+        self.add_account(account=account, primary=primary)
 
         self.__internal_id = next(Accounts.__internal_generator_id)
 
         if not self.__collection_id:
             self.__accounts_collection_id = self.__internal_id  # add internal id as account collection id
 
-    def add_account(self,
-                    account: Account,
-                    primary: bool = False
-                    ): # add as primary account in collection
+    def add_account(self, account: Account, primary: bool = False): # add as primary account in collection
         """Method for add object account to this account collection"""
-
         self.__accounts_by_id[account.account_id] = account
         self.__accounts_numbers.append(account.account_number)
 
@@ -310,29 +321,20 @@ class Accounts:
             self.__primary_item_id = item_id
 
         # set on account link to this collection
-        account.set_collection(value = self,
-                               id_in_collection = item_id
-                              )
+        account.set_collection(value = self, id_in_collection = item_id)
 
-    def account_by_id(self,
-                      account_id: Account.account_id
-                      ) -> Account:
+    def account_by_id(self, account_id: Account.account_id) -> Account:
         """Find account by internal id account"""
-
         result: Account = self.__accounts_by_id.get(account_id)
         if not result:
             raise AccountNotFoundError
         return result
 
-    def __del_account_by_id(self,
-                            account_id: Account.account_id
-                            ):
+    def __del_account_by_id(self, account_id: Account.account_id):
         account: Account = self.account_by_id(account_id = account_id)
         self.__del_account_by_item_id(item_id = account.id_in_collection)
 
-    def __del_account_by_item_id(self,
-                                 item_id: int
-                                 ):
+    def __del_account_by_item_id(self, item_id: int):
         account: Account = self.account_by_item_id(item_id = item_id)
 
         if account == self.primary:
@@ -341,9 +343,7 @@ class Accounts:
         del self.__accounts_by_id[account.account_id]
         account.set_collection(value = None, id_in_collection = None)
 
-    def account_by_number(self,
-                          account_number: Account.account_number
-                          ) -> List[Account]:
+    def account_by_number(self, account_number: Account.account_number) -> List[Account]:
         """Find account by account number"""
         result = []
         item_id: Optional[int] = -1
@@ -369,11 +369,8 @@ class Accounts:
                 raise AccountNotFoundError
         return result
 
-    def account_by_item_id(self,
-                           item_id: int
-                           ) -> Account:
+    def account_by_item_id(self, item_id: int) -> Account:
         """Find account by item id in collection"""
-
         result: Account = self.__accounts.get(item_id)  # work with dictionary accounts
         if not result:
             raise AccountNotFoundError
@@ -413,10 +410,12 @@ class Accounts:
             return item
 
     def __repr__(self) -> str:
-        return (f'Collection(accounts={self.__accounts}'
+        return (
+                f'Collection(accounts={self.__accounts}'
                 f', account_collection_id=({self.__accounts_collection_id})'
                 f', primary={self.primary}'
-                f')')
+                f')'
+               )
 
     @property
     def accounts_collection_id(self):
