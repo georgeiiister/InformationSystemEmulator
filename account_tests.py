@@ -7,7 +7,7 @@ from decimal import Decimal
 # pool of accounts
 acc_pool = tuple((account.Account() for i in range(10)))
 
-# activing of accounts
+# pool of activated accounts
 a_acc = slice(0, int(len(acc_pool) / 2) + 1)
 for account in acc_pool[a_acc]:
     account.activation()
