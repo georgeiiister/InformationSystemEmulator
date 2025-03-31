@@ -85,49 +85,47 @@ class Account:
     __internal_generator_id = seq.Seq(seq_name='account')
 
     __state_new = 0
-    __state_active =  1
-    __state_locked =  2
-    __state_closed =  3
+    __state_active = 1
+    __state_locked = 2
+    __state_closed = 3
     __state_deleted = 4
 
-    __active_account =  'a'
+    __active_account = 'a'
     __passive_account = 'p'
     __active_passive_account = 'ap'
 
-
-
     @classmethod
     def states(cls) -> dict:
-        return  {
-                   cls.__state_new:     'new'
-                 , cls.__state_active:  'active'
-                 , cls.__state_locked:  'locked'
-                 , cls.__state_closed:  'closed'
-                 , cls.__state_deleted: 'deleted'
-                }
+        return {
+            cls.__state_new: 'new'
+            , cls.__state_active: 'active'
+            , cls.__state_locked: 'locked'
+            , cls.__state_closed: 'closed'
+            , cls.__state_deleted: 'deleted'
+        }
 
     @classmethod
     def category_of_account(cls) -> dict:
         return {
-                  cls.__active_account:         'active'
-                , cls.__passive_account:        'passive'
-                , cls.__active_passive_account: 'active_passive'
-                }
+            cls.__active_account: 'active'
+            , cls.__passive_account: 'passive'
+            , cls.__active_passive_account: 'active_passive'
+        }
 
     @classmethod
-    def state_name(cls, state_id)->str:
+    def state_name(cls, state_id) -> str:
         return cls.states().get(state_id)
 
     def __init__(
-                   self
-                 , account_number: str = None
-                 , category:int = None
-                 , balance: Decimal = Decimal('0')
-                 , account_id: Optional[int] = None
-                 , describe: Optional[str] = None
-                 , registration_datetime: datetime.datetime = datetime.datetime.now()
-                 , activation_datetime: Optional[datetime.datetime] = None
-                 ) -> None:
+            self
+            , account_number: str = None
+            , category: int = None
+            , balance: Decimal = Decimal('0')
+            , account_id: Optional[int] = None
+            , describe: Optional[str] = None
+            , registration_datetime: datetime.datetime = datetime.datetime.now()
+            , activation_datetime: Optional[datetime.datetime] = None
+    ) -> None:
 
         self.__account_id = account_id
         self.__balance = balance
@@ -213,9 +211,9 @@ class Account:
         return self.__activation_datetime
 
     def activation(
-                     self
-                   , activation_datetime:Optional[datetime.datetime] = None
-                   ):
+            self
+            , activation_datetime: Optional[datetime.datetime] = None
+    ):
         activation_datetime = activation_datetime or datetime.datetime.now()
 
         if self.registration_datetime > activation_datetime:
@@ -225,9 +223,9 @@ class Account:
         self.__state_id = Account.__state_active
 
     def close(
-                self
-              , close_datetime: Optional[datetime.datetime] = None
-              ):
+            self
+            , close_datetime: Optional[datetime.datetime] = None
+    ):
         close_datetime = close_datetime or datetime.datetime.now()
 
         if self.registration_datetime > close_datetime:
@@ -263,17 +261,17 @@ class Account:
 
     def __repr__(self):
         return (
-                f'Account(account_id={self.account_id}'
-                f', balance={self.balance}'
-                f', account_number={self.account_number}'
-                f', state_id={self.__state_id}'
-                f', account_collection={self.collection}'
-                f', describe={self.describe}'
-                f', registration_datetime={self.registration_datetime}'
-                f', activation_datetime={self.activation_datetime}'
-                f', close_datetime={self.__close_datetime}'
-                f')'
-                )
+            f'Account(account_id={self.account_id}'
+            f', balance={self.balance}'
+            f', account_number={self.account_number}'
+            f', state_id={self.__state_id}'
+            f', account_collection={self.collection}'
+            f', describe={self.describe}'
+            f', registration_datetime={self.registration_datetime}'
+            f', activation_datetime={self.activation_datetime}'
+            f', close_datetime={self.__close_datetime}'
+            f')'
+        )
 
     def __del__(self):
         Account.__count -= 1
@@ -310,7 +308,7 @@ class Accounts:
         if not self.__collection_id:
             self.__accounts_collection_id = self.__internal_id  # add internal id as account collection id
 
-    def add_account(self, account: Account, primary: bool = False): # add as primary account in collection
+    def add_account(self, account: Account, primary: bool = False):  # add as primary account in collection
         """Method for add object account to this account collection"""
         self.__accounts_by_id[account.account_id] = account
         self.__accounts_numbers.append(account.account_number)
@@ -321,7 +319,7 @@ class Accounts:
             self.__primary_item_id = item_id
 
         # set on account link to this collection
-        account.set_collection(value = self, id_in_collection = item_id)
+        account.set_collection(value=self, id_in_collection=item_id)
 
     def account_by_id(self, account_id: Account.account_id) -> Account:
         """Find account by internal id account"""
@@ -331,17 +329,17 @@ class Accounts:
         return result
 
     def __del_account_by_id(self, account_id: Account.account_id):
-        account: Account = self.account_by_id(account_id = account_id)
-        self.__del_account_by_item_id(item_id = account.id_in_collection)
+        account: Account = self.account_by_id(account_id=account_id)
+        self.__del_account_by_item_id(item_id=account.id_in_collection)
 
     def __del_account_by_item_id(self, item_id: int):
-        account: Account = self.account_by_item_id(item_id = item_id)
+        account: Account = self.account_by_item_id(item_id=item_id)
 
         if account == self.primary:
             raise DeletePrimaryAccount
 
         del self.__accounts_by_id[account.account_id]
-        account.set_collection(value = None, id_in_collection = None)
+        account.set_collection(value=None, id_in_collection=None)
 
     def account_by_number(self, account_number: Account.account_number) -> List[Account]:
         """Find account by account number"""
@@ -400,7 +398,7 @@ class Accounts:
         raise NotImplemented
 
     def __del__(self, account_id) -> None:
-        self.__del_account_by_id(account_id = account_id)
+        self.__del_account_by_id(account_id=account_id)
 
     def __iter__(self) -> Iterable:
         return iter(self.__accounts.items())
@@ -411,11 +409,11 @@ class Accounts:
 
     def __repr__(self) -> str:
         return (
-                f'Collection(accounts={self.__accounts}'
-                f', account_collection_id=({self.__accounts_collection_id})'
-                f', primary={self.primary}'
-                f')'
-               )
+            f'Collection(accounts={self.__accounts}'
+            f', account_collection_id=({self.__accounts_collection_id})'
+            f', primary={self.primary}'
+            f')'
+        )
 
     @property
     def accounts_collection_id(self):
