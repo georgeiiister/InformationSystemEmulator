@@ -19,6 +19,8 @@ for i, account in enumerate(acc_pool, 1):
 
 # pool active of account with not zero balance
 acc_pool_balance = (account for account in acc_pool if account.balance > 0)
+for account in acc_pool_balance:
+    print(account.balance)
 
 for account in acc_pool_balance:
     account.debit(amount=account.balance)
