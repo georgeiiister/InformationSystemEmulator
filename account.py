@@ -21,6 +21,10 @@ class RedBalanceError(BalanceError):
     pass
 
 
+class ActiveBalanceError(BalanceError):
+    pass
+
+
 class BalanceIsNotZero(BalanceError):
     pass
 
@@ -73,7 +77,14 @@ class AccountDeleteFromCollectionError(AccountsError):
     pass
 
 
-class DeletePrimaryAccount(AccountDeleteFromCollectionError):
+class PrimaryAccountError(AccountsError):
+    pass
+
+
+class DeletePrimaryAccountError(PrimaryAccountError):
+    pass
+
+class PrimaryAccountNotFoundError(PrimaryAccountError):
     pass
 
 
@@ -172,6 +183,9 @@ class Account:
     def credit(self, amount: Decimal) -> None:
         if self.activation_datetime is None:
             raise NotSetDateBeginOfAction
+        if abs(self.__balance) < amount and self.__category == Account.__active_account:
+            raise ActiveBalanceError
+
         self.__balance += amount
 
     def debit(self, amount: Decimal):
@@ -283,10 +297,10 @@ class Accounts:
     __internal_generator_id = seq.Seq(seq_name='accounts')
     __internal_generator_account_id = seq.Seq(seq_name='account')
 
-    def __init__(self,
-                 account: Account,
-                 accounts_collection_id: Optional[int] = None,
-                 primary: bool = False  # add as primary account in collection
+    def __init__(self
+                 , accounts: Iterable[Account]
+                 , primary_id: Account.account_id  # id primary account in collection
+                 , accounts_collection_id: Optional[int] = None
                  ):
 
         self.__collection_id = accounts_collection_id
@@ -295,14 +309,14 @@ class Accounts:
         self.__accounts: Dict[int, Account] = dict()
         self.__primary_item_id: Optional[int] = None
 
-        self.add_account(account=account, primary=primary)
+        self.add_account(accounts=accounts, primary_id=primary_id)
 
         self.__internal_id = next(Accounts.__internal_generator_id)
 
         if not self.__collection_id:
             self.__accounts_collection_id = self.__internal_id  # add internal id as account collection id
 
-    def add_account(self, account: Account, primary: bool = False):  # add as primary account in collection
+    def __add_account(self, account: Account, primary: bool = False):  # add as primary account in collection
         """Method for add object account to this account collection"""
         self.__accounts_by_id[account.account_id] = account
         self.__accounts_numbers.append(account.account_number)
@@ -314,6 +328,22 @@ class Accounts:
 
         # set on account link to this collection
         account.set_collection(value=self, id_in_collection=item_id)
+
+    def add_account(self, accounts: Iterable[Account] | Account, primary_id: Optional[Account.account_id]):
+        try:
+            for account in accounts:
+                self.__add_account(
+                    account=account,
+                    primary=account.account_id == primary_id
+                )
+        except TypeError:
+            self.__add_account(
+                account=accounts,
+                primary=accounts.account_id == primary_id
+            )
+
+        if self.primary is None:
+            raise PrimaryAccountNotFoundError
 
     def account_by_id(self, account_id: Account.account_id) -> Account:
         """Find account by internal id account"""
@@ -330,7 +360,7 @@ class Accounts:
         account: Account = self.account_by_item_id(item_id=item_id)
 
         if account == self.primary:
-            raise DeletePrimaryAccount
+            raise DeletePrimaryAccountError
 
         del self.__accounts_by_id[account.account_id]
         account.set_collection(value=None, id_in_collection=None)
@@ -377,8 +407,8 @@ class Accounts:
     @primary.setter
     def primary(self, item_id: int) -> None:
         """Method set primary account in collection"""
-
         result: Account = self.account_by_item_id(item_id=item_id)
+
         if not result:
             raise AccountNotFoundError
         self.__primary_item_id = item_id
