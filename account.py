@@ -210,10 +210,7 @@ class Account:
     def activation_datetime(self):
         return self.__activation_datetime
 
-    def activation(
-            self
-            , activation_datetime: Optional[datetime.datetime] = None
-    ):
+    def activation(self, activation_datetime: Optional[datetime.datetime] = None):
         activation_datetime = activation_datetime or datetime.datetime.now()
 
         if self.registration_datetime > activation_datetime:
@@ -222,10 +219,7 @@ class Account:
         self.__activation_datetime = activation_datetime
         self.__state_id = Account.__state_active
 
-    def close(
-            self
-            , close_datetime: Optional[datetime.datetime] = None
-    ):
+    def close(self, close_datetime: Optional[datetime.datetime] = None):
         close_datetime = close_datetime or datetime.datetime.now()
 
         if self.registration_datetime > close_datetime:
