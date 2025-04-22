@@ -128,15 +128,15 @@ class Account:
         return cls.states().get(state_id)
 
     def __init__(
-            self
-            , account_number: str = None
-            , category: int = None
-            , balance: Decimal = Decimal('0')
-            , account_id: Optional[int] = None
-            , describe: Optional[str] = None
-            , registration_datetime: datetime.datetime = datetime.datetime.now()
-            , activation_datetime: Optional[datetime.datetime] = None
-    ) -> None:
+                    self
+                    , account_number: str = None
+                    , category: int = None
+                    , balance: Decimal = Decimal('0')
+                    , account_id: Optional[int] = None
+                    , describe: Optional[str] = None
+                    , registration_datetime: datetime.datetime = datetime.datetime.now()
+                    , activation_datetime: Optional[datetime.datetime] = None
+                ) -> None:
 
         self.__account_id = account_id
         self.__balance = balance
