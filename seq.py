@@ -1,27 +1,28 @@
-from typing import Optional
 import pickle
 
+from typing import Optional
+from object import Object
 
-class Seq:
+class Seq(Object):
     __begin = 1
     __end = 100_000_000_000
-    __increment = 1
-    __seq_name = (seq_number for seq_number in range(__begin, __end, __increment))
+    __step = 1
+    __seq_name = (seq_number for seq_number in range(__begin, __end, __step))
 
     def __init__(self
                  , seq_name: str = None
                  , begin: Optional[int] = None
                  , end: Optional[int] = None
-                 , increment: Optional[int] = None
+                 , step: Optional[int] = None
                  ):
+        Object.__init__(self)
         self.__begin = begin or Seq.__begin
         self.__end = end or Seq.__end
-        self.__step = increment or Seq.__increment
+        self.__step = step or Seq.__step
         self.__seq_name = seq_name or f'seq{next(Seq.__seq_name)}'
 
         self.__val = None
-        self.__iterator_expression = iter(range(self.__begin, self.__end, self.__increment))
-
+        self.__iterator_expression = (i for i in range(self.__begin, self.__end, self.__step))
         self.__lock = False
 
     @property
@@ -37,16 +38,15 @@ class Seq:
         return self.__end
 
     @property
-    def increment(self):
-        return self.__increment
+    def step(self):
+        return self.__step
 
     def __iter__(self):
-        return self.__iterator_expression
+        return self
 
     def __next__(self):
-        for i in self:
-            self.__val = i
-            return self.__val
+        self.__val = next(self.__iterator_expression)
+        return self.__val
 
     def pickle(self):
         return self.seq_name, pickle.dumps(self)

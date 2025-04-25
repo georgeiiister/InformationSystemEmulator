@@ -1,9 +1,11 @@
 import uuid
 import pickle
-from typing import Optional
 import seq
 
-class Queue:
+from object import Object
+from typing import Optional
+
+class Queue(Object):
     class QueueError(Exception):
         pass
 
@@ -24,6 +26,8 @@ class Queue:
         return cls.__error_if_lock
 
     def __init__(self, size:int, error_if_lock:Optional[bool] = None):
+        Object.__init__(self)
+
         self.__size = size
         self.__queue = []
         self.__status_lock = error_if_lock or self.__class__._status_lock()

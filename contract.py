@@ -2,7 +2,9 @@ import account
 import person
 import legalperson
 
-class Contract:
+from object import Object
+
+class Contract(Object):
     """Main class for create object contract"""
 
     def __init__(self
@@ -11,6 +13,7 @@ class Contract:
                  , owner: object
                  , accounts: account.Accounts
                  ):
+        Object.__init__(self)
 
         self.__contract_id = contract_id
         self.__accounts = accounts
