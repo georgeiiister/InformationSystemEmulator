@@ -2,11 +2,13 @@ import datetime
 import seq
 import pickle
 
+
 from typing import Optional
 from typing import Dict
 from typing import List
 from typing import Iterable
 from decimal import Decimal
+from object import Object
 
 
 class AccountError(Exception):
@@ -88,7 +90,7 @@ class PrimaryAccountNotFoundError(PrimaryAccountError):
     pass
 
 
-class Account:
+class Account(Object):
     """Main class for creation object account"""
 
     __count = 0
@@ -138,6 +140,9 @@ class Account:
                     , activation_datetime: Optional[datetime.datetime] = None
                 ) -> None:
 
+        Account.__internal_id = next(Account.__internal_generator_id)
+        Object.__init__(self, internal_id = Account.__internal_id)
+
         self.__account_id = account_id
         self.__balance = balance
         self.__describe = describe
@@ -147,10 +152,6 @@ class Account:
         self.__id_in_collection = None
         self.__lock = False
 
-        Account.__count += 1
-        Account.__internal_id = next(Account.__internal_generator_id)
-        self.__internal_id = Account.__internal_id
-
         if not self.__account_id:
             self.__account_id = Account.__internal_id
 
@@ -159,7 +160,7 @@ class Account:
         if activation_datetime is not None:
             self.activation(activation_datetime=activation_datetime)
         else:
-            self.__state_id = Account.__state_new
+            self.state_id = Account.__state_new
             self.__activation_datetime = activation_datetime
 
         if category is None:
@@ -167,6 +168,8 @@ class Account:
 
         if Account.category_of_account().get(self.__category) is None:
             raise CategoryOfAccountError
+
+        Account.__count += 1
 
     @property
     def collection(self):
@@ -231,7 +234,7 @@ class Account:
             raise NotValidDateActivationError
 
         self.__activation_datetime = activation_datetime
-        self.__state_id = Account.__state_active
+        self.state_id = Account.__state_active
 
     def close(self, close_datetime: Optional[datetime.datetime] = None):
         close_datetime = close_datetime or datetime.datetime.now()
@@ -242,15 +245,12 @@ class Account:
         if self.balance != 0:
             raise BalanceIsNotZero
 
-        if self.__state_id == Account.__state_closed:
+        if self.state_id == Account.__state_closed:
             raise StateError
 
         self.__close_datetime = close_datetime
-        self.__state_id = Account.__state_closed
+        self.state_id = Account.__state_closed
 
-    @property
-    def state(self):
-        return self.__state_id
 
     @property
     def pickle(self):
@@ -262,7 +262,7 @@ class Account:
 
     @property
     def active(self):
-        return Account.__state_active == self.__state_id
+        return Account.__state_active == self.state_id
 
     def __hash__(self):
         return hash(self.account_id)
@@ -291,17 +291,21 @@ class Account:
         self.__lock = False
 
 
-class Accounts:
+class Accounts(Object):
     """Main class for creation collection of accounts"""
 
+    __count = 0
     __internal_generator_id = seq.Seq(seq_name='accounts')
     __internal_generator_account_id = seq.Seq(seq_name='account')
 
-    def __init__(self
+    def __init__(
+                 self
                  , accounts: Iterable[Account]
                  , primary_id: Account.account_id  # id primary account in collection
                  , accounts_collection_id: Optional[int] = None
                  ):
+
+        Object.__init__(self, internal_id =  next(Accounts.__internal_generator_id))
 
         self.__collection_id = accounts_collection_id
         self.__accounts_by_id: Dict[Account.account_id, Account] = dict()
@@ -311,10 +315,10 @@ class Accounts:
 
         self.add_account(accounts=accounts, primary_id=primary_id)
 
-        self.__internal_id = next(Accounts.__internal_generator_id)
-
         if not self.__collection_id:
-            self.__accounts_collection_id = self.__internal_id  # add internal id as account collection id
+            self.__accounts_collection_id = self.internal_id  # add internal id as account collection id
+
+        Accounts.__count += 1
 
     def __add_account(self, account: Account, primary: bool = False):  # add as primary account in collection
         """Method for add object account to this account collection"""
@@ -401,8 +405,11 @@ class Accounts:
     @property
     def primary(self) -> Optional[Account]:
         """Method return primary account in collection"""
+        result = None
         if self.__primary_item_id:
-            return self.account_by_item_id(item_id=self.__primary_item_id)
+            result = self.account_by_item_id(item_id=self.__primary_item_id)
+
+        return result
 
     @primary.setter
     def primary(self, item_id: int) -> None:
@@ -420,16 +427,6 @@ class Accounts:
     @property
     def __len__(self) -> int:
         raise NotImplemented
-
-    def __del__(self, account_id) -> None:
-        self.__del_account_by_id(account_id=account_id)
-
-    def __iter__(self) -> Iterable:
-        return iter(self.__accounts.items())
-
-    def __next__(self):
-        for item in self:
-            return item
 
     def __repr__(self) -> str:
         return (
