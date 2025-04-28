@@ -41,6 +41,9 @@ class Seq(Object):
     def step(self):
         return self.__step
 
+    def next_id(self):
+        return self.__next__()
+
     def __iter__(self):
         return self
 
