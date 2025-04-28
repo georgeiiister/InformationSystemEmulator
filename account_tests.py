@@ -3,7 +3,6 @@ import random
 
 from decimal import Decimal
 from account import Accounts
-from functools import reduce
 
 # pool of accounts
 acc_pool = tuple((account.Account() for i in range(10)))
