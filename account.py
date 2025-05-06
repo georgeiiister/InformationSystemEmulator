@@ -107,10 +107,25 @@ class Account(Object):
     __passive_account = 'p'
     __active_passive_account = 'ap'
 
+    __slots__ = (
+                    '__account_id'
+                    ,'__balance'
+                    , '__describe'
+                    , '__registration_datetime'
+                    , '__close_datetime'
+                    , '__collection'
+                    , '__id_in_collection'
+                    , '__lock'
+                    , '__account_id'
+                    , '__account_number'
+                    , '__activation_datetime'
+                    , '__category'
+                )
+
     @classmethod
     def states(cls) -> dict:
         return {
-            cls.__state_new: 'new'
+              cls.__state_new: 'new'
             , cls.__state_active: 'active'
             , cls.__state_locked: 'locked'
             , cls.__state_closed: 'closed'
@@ -160,7 +175,7 @@ class Account(Object):
         if activation_datetime is not None:
             self.activation(activation_datetime=activation_datetime)
         else:
-            self.state_id = Account.__state_new
+            self.__state_id = Account.__state_new
             self.__activation_datetime = activation_datetime
 
         if category is None:
@@ -234,7 +249,7 @@ class Account(Object):
             raise NotValidDateActivationError
 
         self.__activation_datetime = activation_datetime
-        self.state_id = Account.__state_active
+        self.__state_id = Account.__state_active
 
     def close(self, close_datetime: Optional[datetime.datetime] = None):
         close_datetime = close_datetime or datetime.datetime.now()
@@ -245,11 +260,11 @@ class Account(Object):
         if self.balance != 0:
             raise BalanceIsNotZero
 
-        if self.state_id == Account.__state_closed:
+        if self.__state_id == Account.__state_closed:
             raise StateError
 
         self.__close_datetime = close_datetime
-        self.state_id = Account.__state_closed
+        self.__state_id = Account.__state_closed
 
 
     @property
@@ -262,7 +277,7 @@ class Account(Object):
 
     @property
     def active(self):
-        return Account.__state_active == self.state_id
+        return Account.__state_active == self.__state_id
 
     def __hash__(self):
         return hash(self.account_id)
@@ -272,7 +287,7 @@ class Account(Object):
             f'Account(account_id={self.account_id}'
             f', balance={self.balance}'
             f', account_number={self.account_number}'
-            f', state_id={self.__state_id}'
+            f', __state_id={self.__state_id}'
             f', account_collection={self.collection}'
             f', describe={self.describe}'
             f', registration_datetime={self.registration_datetime}'
@@ -294,6 +309,14 @@ class Account(Object):
 class Accounts(Object):
     """Main class for creation collection of accounts"""
 
+    __slots__ = (
+                    '__collection_id'
+                    , '__accounts_by_id'
+                    , '__accounts_numbers'
+                    , '__accounts'
+                    , '__primary_item_id'
+                    , '__accounts_collection_id'
+                )
     __count = 0
     __internal_generator_id = seq.Seq(seq_name='accounts')
     __internal_generator_account_id = seq.Seq(seq_name='account')
