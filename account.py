@@ -11,7 +11,7 @@ from decimal import Decimal
 from object import Object
 
 from error_of_account import (
-                              , RedBalanceError
+                                RedBalanceError
                               , ActiveBalanceError
                               , BalanceIsNotZero
                               , NotSetDateBeginOfAction
