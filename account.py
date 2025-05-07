@@ -11,24 +11,15 @@ from decimal import Decimal
 from object import Object
 
 from error_of_account import (
-                                AccountError
-                              , BalanceError
                               , RedBalanceError
                               , ActiveBalanceError
                               , BalanceIsNotZero
-                              , ActivationError
-                              , DateActivationError
                               , NotSetDateBeginOfAction
                               , NotValidDateActivationError
-                              , CloseError
-                              , DateCloseError
                               , NotValidDateCloseError
                               , StateError
                               , CategoryOfAccountError
-                              , AccountsError
                               , AccountNotFoundError
-                              , AccountDeleteFromCollectionError
-                              , PrimaryAccountError
                               , DeletePrimaryAccountError
                               , PrimaryAccountNotFoundError
                              )
