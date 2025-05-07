@@ -10,84 +10,28 @@ from typing import Iterable
 from decimal import Decimal
 from object import Object
 
-
-class AccountError(Exception):
-    pass
-
-
-class BalanceError(AccountError):
-    pass
-
-
-class RedBalanceError(BalanceError):
-    pass
-
-
-class ActiveBalanceError(BalanceError):
-    pass
-
-
-class BalanceIsNotZero(BalanceError):
-    pass
-
-
-class ActivationError(AccountError):
-    pass
-
-
-class DateActivationError(ActivationError):
-    pass
-
-
-class NotSetDateBeginOfAction(DateActivationError):
-    pass
-
-
-class NotValidDateActivationError(DateActivationError):
-    pass
-
-
-class CloseError(AccountError):
-    pass
-
-
-class DateCloseError(CloseError):
-    pass
-
-
-class NotValidDateCloseError(DateCloseError):
-    pass
-
-
-class StateError(AccountError):
-    pass
-
-
-class CategoryOfAccountError(AccountError):
-    pass
-
-
-class AccountsError(Exception):
-    pass
-
-
-class AccountNotFoundError(AccountsError):
-    pass
-
-
-class AccountDeleteFromCollectionError(AccountsError):
-    pass
-
-
-class PrimaryAccountError(AccountsError):
-    pass
-
-
-class DeletePrimaryAccountError(PrimaryAccountError):
-    pass
-
-class PrimaryAccountNotFoundError(PrimaryAccountError):
-    pass
+from error_of_account import (
+                                AccountError
+                              , BalanceError
+                              , RedBalanceError
+                              , ActiveBalanceError
+                              , BalanceIsNotZero
+                              , ActivationError
+                              , DateActivationError
+                              , NotSetDateBeginOfAction
+                              , NotValidDateActivationError
+                              , CloseError
+                              , DateCloseError
+                              , NotValidDateCloseError
+                              , StateError
+                              , CategoryOfAccountError
+                              , AccountsError
+                              , AccountNotFoundError
+                              , AccountDeleteFromCollectionError
+                              , PrimaryAccountError
+                              , DeletePrimaryAccountError
+                              , PrimaryAccountNotFoundError
+                             )
 
 
 class Account(Object):
@@ -175,8 +119,8 @@ class Account(Object):
         if activation_datetime is not None:
             self.activation(activation_datetime=activation_datetime)
         else:
-            self.__state_id = Account.__state_new
-            self.__activation_datetime = activation_datetime
+            self.state_id = Account.__state_new
+            self.__activation_datetime = None
 
         if category is None:
             self.__category = Account.__passive_account
@@ -249,7 +193,7 @@ class Account(Object):
             raise NotValidDateActivationError
 
         self.__activation_datetime = activation_datetime
-        self.__state_id = Account.__state_active
+        self.state_id = Account.__state_active
 
     def close(self, close_datetime: Optional[datetime.datetime] = None):
         close_datetime = close_datetime or datetime.datetime.now()
@@ -277,7 +221,7 @@ class Account(Object):
 
     @property
     def active(self):
-        return Account.__state_active == self.__state_id
+        return Account.__state_active == self.state_id
 
     def __hash__(self):
         return hash(self.account_id)

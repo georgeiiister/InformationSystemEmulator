@@ -1,0 +1,3 @@
+class InformationSystemError(Exception):
+    pass
+
