@@ -9,19 +9,17 @@ from typing import Iterable
 from decimal import Decimal
 from object import Object
 
-from error_of_account import (
-                                  RedBalanceError
-                                , ActiveBalanceError
-                                , BalanceIsNotZero
-                                , NotSetDateBeginOfAction
-                                , NotValidDateActivationError
-                                , NotValidDateCloseError
-                                , StateError
-                                , CategoryOfAccountError
-                                , AccountNotFoundError
-                                , DeletePrimaryAccountError
-                                , PrimaryAccountNotFoundError
-                            )
+from error_of_account import RedBalanceError
+from error_of_account import ActiveBalanceError
+from error_of_account import BalanceIsNotZero
+from error_of_account import NotSetDateBeginOfAction
+from error_of_account import NotValidDateActivationError
+from error_of_account import NotValidDateCloseError
+from error_of_account import StateError
+from error_of_account import CategoryOfAccountError
+from error_of_account import AccountNotFoundError
+from error_of_account import DeletePrimaryAccountError
+from error_of_account import PrimaryAccountNotFoundError
 
 
 class Account(Object):
@@ -257,7 +255,7 @@ class Accounts(Object):
     def __init__(
             self
             , accounts: Iterable[Account]
-            , primary_id: Account.account_id  # id primary account in collection
+            , primary_id: Account.account_id
             , accounts_collection_id: Optional[int] = None
     ):
 
