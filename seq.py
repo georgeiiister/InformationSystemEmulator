@@ -3,6 +3,7 @@ import pickle
 from typing import Optional
 from object import Object
 
+
 class Seq(Object):
     __begin = 1
     __end = 100_000_000_000
@@ -22,7 +23,7 @@ class Seq(Object):
         self.__seq_name = seq_name or f'seq{next(Seq.__seq_name)}'
 
         self.__val = None
-        self.__iterator_expression = (i for i in range(self.__begin, self.__end, self.__step))
+        self.__generator_expression = (i for i in range(self.__begin, self.__end, self.__step))
         self.__lock = False
 
     @property
@@ -44,11 +45,8 @@ class Seq(Object):
     def next_id(self):
         return self.__next__()
 
-    def __iter__(self):
-        return self
-
     def __next__(self):
-        self.__val = next(self.__iterator_expression)
+        self.__val = next(self.__generator_expression)
         return self.__val
 
     def pickle(self):

@@ -3,7 +3,7 @@ import threading
 
 with seq.Seq() as s1:
     for i in range(5):
-        print(next(s1),end=' ')
+        print(next(s1), end=' ')
 
 print()
 
@@ -13,9 +13,10 @@ for i in range(5):
 
 print()
 
-class Threads_(threading.Thread):
-    def __init__(self,name, seq):
-        super().__init__(name = name)
+
+class ThreadsTest(threading.Thread):
+    def __init__(self, name, seq):
+        super().__init__(name=name)
         self.__seq = seq
         self.__result = []
 
@@ -25,19 +26,17 @@ class Threads_(threading.Thread):
                 sum(range(10_000_000))
                 self.__result.append(next(self.__seq))
             except StopIteration:
-                print(self.name+':'+str(self.result))
+                print(self.name + ': ' + str(self.result))
                 break
 
     @property
     def result(self):
         return self.__result
 
-s2 = seq.Seq(seq_name='check_thread',begin = 1, step = 1, end=20)
 
-threads = (Threads_(name=f'thread{i}',seq = s2) for i in range(4))
+s2 = seq.Seq(seq_name='check_thread', begin=1, step=1, end=20)
+
+threads = (ThreadsTest(name=f'thread{i}', seq=s2) for i in range(4))
 
 for i in threads:
     i.start()
-
-
-
