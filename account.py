@@ -40,52 +40,52 @@ class Account(Object):
     __active_passive_account = 'ap'
 
     __slots__ = (
-        '__account_id'
-        , '__balance'
-        , '__describe'
-        , '__registration_datetime'
-        , '__close_datetime'
-        , '__collection'
-        , '__id_in_collection'
-        , '__lock'
-        , '__account_id'
-        , '__account_number'
-        , '__activation_datetime'
-        , '__category'
+        '__account_id',
+        '__balance',
+        '__describe',
+        '__registration_datetime',
+        '__close_datetime',
+        '__collection',
+        '__id_in_collection',
+        '__lock',
+        '__account_id',
+        '__account_number',
+        '__activation_datetime',
+        '__category'
     )
 
     @classmethod
     def states(cls) -> dict:
         return {
-            cls.__state_new: 'new'
-            , cls.__state_active: 'active'
-            , cls.__state_locked: 'locked'
-            , cls.__state_closed: 'closed'
-            , cls.__state_deleted: 'deleted'
+            cls.__state_new: 'new',
+            cls.__state_active: 'active',
+            cls.__state_locked: 'locked',
+            cls.__state_closed: 'closed',
+            cls.__state_deleted: 'deleted'
         }
 
     @classmethod
     def category_of_account(cls) -> dict:
         return {
-            cls.__active_account: 'active'
-            , cls.__passive_account: 'passive'
-            , cls.__active_passive_account: 'active_passive'
-        }
+                    cls.__active_account: 'active',
+                    cls.__passive_account: 'passive',
+                    cls.__active_passive_account: 'active_passive'
+                }
 
     @classmethod
     def state_name(cls, state_id) -> str:
         return cls.states().get(state_id)
 
     def __init__(
-            self
-            , account_number: str = None
-            , category: int = None
-            , balance: Decimal = Decimal('0')
-            , account_id: Optional[int] = None
-            , describe: Optional[str] = None
-            , registration_datetime: datetime.datetime = datetime.datetime.now()
-            , activation_datetime: Optional[datetime.datetime] = None
-    ) -> None:
+                    self,
+                    account_number: str = None,
+                    category: int = None,
+                    balance: Decimal = Decimal('0'),
+                    account_id: Optional[int] = None,
+                    describe: Optional[str] = None,
+                    registration_datetime: datetime.datetime = datetime.datetime.now(),
+                    activation_datetime: Optional[datetime.datetime] = None
+                ) -> None:
 
         Account.__internal_id = next(Account.__internal_generator_id)
         Object.__init__(self, internal_id=Account.__internal_id)
@@ -192,11 +192,11 @@ class Account(Object):
         if self.balance != 0:
             raise BalanceIsNotZero
 
-        if self.__state_id == Account.__state_closed:
+        if self.state_id == Account.__state_closed:
             raise StateError
 
         self.__close_datetime = close_datetime
-        self.__state_id = Account.__state_closed
+        self.state_id = Account.__state_closed
 
     @property
     def pickle(self):
@@ -215,17 +215,17 @@ class Account(Object):
 
     def __repr__(self):
         return (
-            f'Account(account_id={self.account_id}'
-            f', balance={self.balance}'
-            f', account_number={self.account_number}'
-            f', __state_id={self.__state_id}'
-            f', account_collection={self.collection}'
-            f', describe={self.describe}'
-            f', registration_datetime={self.registration_datetime}'
-            f', activation_datetime={self.activation_datetime}'
-            f', close_datetime={self.__close_datetime}'
-            f')'
-        )
+                    f'Account(account_id={self.__account_id}'
+                    f', balance={self.balance}'
+                    f', account_number={self.account_number}'
+                    f', state_id={self.state_id}'
+                    f', account_collection={self.collection}'
+                    f', describe={self.describe}'
+                    f', registration_datetime={self.registration_datetime}'
+                    f', activation_datetime={self.activation_datetime}'
+                    f', close_datetime={self.__close_datetime}'
+                    f')'
+                )
 
     def __del__(self):
         Account.__count -= 1
@@ -241,23 +241,23 @@ class Accounts(Object):
     """Main class for creation collection of accounts"""
 
     __slots__ = (
-        '__collection_id'
-        , '__accounts_by_id'
-        , '__accounts_numbers'
-        , '__accounts'
-        , '__primary_item_id'
-        , '__accounts_collection_id'
-    )
+                    '__collection_id',
+                    '__accounts_by_id',
+                    '__accounts_numbers',
+                    '__accounts',
+                    '__primary_item_id',
+                    '__accounts_collection_id'
+                )
     __count = 0
     __internal_generator_id = seq.Seq(seq_name='accounts')
     __internal_generator_account_id = seq.Seq(seq_name='account')
 
     def __init__(
-            self
-            , accounts: Iterable[Account]
-            , primary_id: Account.account_id
-            , accounts_collection_id: Optional[int] = None
-    ):
+                    self,
+                    accounts: Iterable[Account],
+                    primary_id: Account.account_id,
+                    accounts_collection_id: Optional[int] = None
+                ):
 
         Object.__init__(self, internal_id=next(Accounts.__internal_generator_id))
 
@@ -386,7 +386,7 @@ class Accounts(Object):
         return (
             f'Collection(accounts={self.__accounts}'
             f', account_collection_id=({self.__accounts_collection_id})'
-            f', primary={self.primary}'
+            f', primary_id={self.primary.account_id}'
             f')'
         )
 
