@@ -109,3 +109,30 @@ class CollectionNumber(Collection):
     def deep_sum(self):
         self.__deep_sum = self.__deep_sum or sum(self.vector_tuple)
         return self.__deep_sum
+
+class UHash:
+
+    @staticmethod
+    def hash_(value)->int:
+        result = None
+        try:
+            result = hash(value)
+        except TypeError:
+            pass
+        return result
+
+    @staticmethod
+    def is_hash_by(value)->bool:
+        return bool(UHash.hash_(value=value))
+
+    def __init__(self, value):
+        self.__value = value
+        self.__hash = self.__class__.hash_(value = self.__value)
+
+    @property
+    def hash(self):
+        return self.__hash
+
+    @property
+    def value(self):
+        return self.__value
