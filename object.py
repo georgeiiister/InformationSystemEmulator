@@ -5,12 +5,6 @@ from typing import Optional
 
 class Object(abc.ABC):
 
-    __slots__ = (
-                    '__internal_id'
-                    , '__name'
-                    , '__state_id'
-                )
-
     def __init__(
             self
             , internal_id: Optional[int] = None
