@@ -10,6 +10,7 @@ class Collection:
         self.__histogram = dict()
         self.__collection_tuple = tuple()
         self.__ucc = dict() #universal collection cache
+        self.__distinct = type(self.__value)()
 
     @property
     def collection_value(self):
@@ -99,6 +100,28 @@ class Collection:
                               ucc_value=self.get_value_in_ucc(key_max) or max(self.vector_tuple)
                               )
         return self.get_value_in_ucc(ucc_key=key_min), self.get_value_in_ucc(ucc_key=key_max)
+
+    @property
+    def distinct(self):
+        def to_type(value):
+            if isinstance(self.__distinct,str):
+                return '\''+','.join(list(value))+'\''
+            else:
+                return type(self.__distinct)(value)
+
+        def is_double(item,index_of_item):
+            result = False
+            if self.__value.count(item)==1:
+                result = True
+            elif self.__value.count(item)>1 and self.__value.index(item)==index_of_item:
+                result = True
+            return result
+
+        if not self.__distinct:
+            self.__distinct = to_type((item for i,item in enumerate(self.__value)
+                                         if is_double(item,i)))
+
+        return self.__distinct
 
 class CollectionNumber(Collection):
     def __init__(self,value:Union[list[int],tuple[int]]):
