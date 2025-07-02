@@ -10,6 +10,6 @@ o1 = Collection(value=[3,2,1,1,2,3])
 o2 = Collection(value='321123')
 o3 = Collection(value=(3,2,1,1,2,3))
 
-print()
+print('get distinct items from collections')
 for i in (o1,o2,o3):
-    print(f'source = {i.collection_value}, distinct={i.distinct}')
+    print(f'source collections = {i.collection_value}, collection with distinct items={i.distinct}')
