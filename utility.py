@@ -159,3 +159,34 @@ class UHash:
     @property
     def value(self):
         return self.__value
+
+class String:
+    @staticmethod
+    def str2float(value)->float|None:
+        result = None
+        try:
+            result = float(value)
+        except ValueError:
+            pass
+        return result
+
+    @staticmethod
+    def str2int(value) -> int | None:
+        result = None
+        try:
+            result = int(value)
+        except ValueError:
+            pass
+        return result
+
+    def __init__(self,value):
+        self.__value = value
+
+    @property
+    def string_value(self):
+        return self.__value
+
+    def slist2list(self)->list:
+        """if value it is list as str"""
+        char_for_delete = {'[', ']', ' ', ','}
+        return [i for i in self.__value if i not in char_for_delete]

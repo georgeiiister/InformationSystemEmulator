@@ -1,5 +1,6 @@
 from utility import UHash
 from utility import Collection
+from utility import String
 
 objects = ([1,2], 100001, 'acc___', 101.12, (1,2), {3,2})
 
@@ -13,3 +14,7 @@ o3 = Collection(value=(3,2,1,1,2,3))
 print('get distinct items from collections')
 for i in (o1,o2,o3):
     print(f'source collections = {i.collection_value}, collection with distinct items={i.distinct}')
+
+objects = ('[1,2,3]','[123]','[1, 2, 3 ]','[12,3')
+for i in objects:
+    print([String.str2int(i) for i in String(i).slist2list()])
