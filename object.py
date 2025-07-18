@@ -9,11 +9,11 @@ class Object(abc.ABC):
             self
             , internal_id: Optional[int] = None
             , name: Optional[str] = None
-            , state_id: Optional[int] = None
+            , state: Optional[object] = None
     ):
         self.__internal_id = internal_id
         self.__name = name
-        self.__state_id = state_id
+        self.__state = state
 
     @property
     def internal_id(self):
@@ -29,12 +29,15 @@ class Object(abc.ABC):
 
     @name.setter
     def name(self, value: str):
-        self.__name = name_op
+        self.__name = value
 
     @property
-    def state_id(self):
-        return self.__state_id
+    def state(self):
+        return self.__state
 
-    @state_id.setter
-    def state_id(self, value: int):
-        self.__state_id = value
+    @state.setter
+    def state(self, value: object):
+        self.__state = value
+
+    def __eq__(self, other):
+        return self.internal_id == other.internal_id
