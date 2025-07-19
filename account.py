@@ -21,31 +21,11 @@ from error_of_account import AccountNotFoundError
 from error_of_account import DeletePrimaryAccountError
 from error_of_account import PrimaryAccountNotFoundError
 
-
-class StateNew(Object):
-    def __init__(self):
-        super().__init__(internal_id = 0, name = 'new', state = None)
-
-
-class StateActive(Object):
-    def __init__(self):
-        super().__init__(internal_id = 1, name = 'active', state = None)
-
-
-class StateLocked(Object):
-    def __init__(self):
-        super().__init__(internal_id = 2, name = 'locked', state = None)
-
-
-class StateClosed(Object):
-    def __init__(self):
-        super().__init__(internal_id = 3, name = 'closed', state = None)
-
-
-class StateDeleted(Object):
-    def __init__(self):
-        super().__init__(internal_id = 4, name = 'deleted', state = None)
-
+from state import New
+from state import Active
+from state import Locked
+from state import Closed
+from state import Deleted
 
 class Account(Object):
     """Main class for creation object account"""
@@ -112,7 +92,7 @@ class Account(Object):
         if activation_datetime is not None:
             self.activation(activation_datetime=activation_datetime)
         else:
-            self.state = StateNew()
+            self.state = New()
             self.__activation_datetime = None
 
         if category is None:
@@ -186,7 +166,7 @@ class Account(Object):
             raise NotValidDateActivationError
 
         self.__activation_datetime = activation_datetime
-        self.state = StateActive()
+        self.state = Active()
 
     def close(self, close_datetime: Optional[datetime.datetime] = None):
         close_datetime = close_datetime or datetime.datetime.now()
@@ -197,11 +177,11 @@ class Account(Object):
         if self.balance != 0:
             raise BalanceIsNotZero
 
-        if self.state == StateClosed():
+        if self.state == Closed():
             raise StateError
 
         self.__close_datetime = close_datetime
-        self.state = StateClosed()
+        self.state = Closed()
 
     @property
     def pickle(self):
@@ -213,7 +193,7 @@ class Account(Object):
 
     @property
     def active(self):
-        return StateActive() == self.state
+        return Active() == self.state
 
     @property
     def state_id(self):

@@ -40,4 +40,5 @@ class Object(abc.ABC):
         self.__state = value
 
     def __eq__(self, other):
-        return self.internal_id == other.internal_id
+        is_id = self.internal_id == other.internal_id # self.id == other.id ?
+        return is_id and type(self) == type(other)

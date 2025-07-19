@@ -33,11 +33,13 @@ for account in acc_pool[a_acc]:
 print('top up accounts')
 for i, account in enumerate(acc_pool, 1):
     if account.active:
-        amount: Decimal = Decimal(str(round(random.randint(1, 1000_000) * random.random(), 2)))
+        amount: Decimal = Decimal(str(round(random.randint(1, 1000_000)
+                                            * random.random(), 2)))
         account.credit(amount=amount)
 
 # pool active of account with not zero balance
-acc_pool_balance = tuple((account for account in acc_pool if account.balance > 0))
+acc_pool_balance = tuple((account for account in acc_pool
+                          if account.balance > 0))
 
 for account in acc_pool_balance:
 
