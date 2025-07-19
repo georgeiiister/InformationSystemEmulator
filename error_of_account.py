@@ -48,10 +48,6 @@ class NotValidDateCloseError(DateCloseError):
     pass
 
 
-class StateError(AccountError):
-    pass
-
-
 class CategoryOfAccountError(AccountError):
     pass
 

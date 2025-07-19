@@ -9,23 +9,20 @@ from typing import Iterable
 from decimal import Decimal
 from object import Object
 
+from error import StateError
+
 from error_of_account import RedBalanceError
 from error_of_account import ActiveBalanceError
 from error_of_account import BalanceIsNotZero
 from error_of_account import NotSetDateBeginOfAction
 from error_of_account import NotValidDateActivationError
 from error_of_account import NotValidDateCloseError
-from error_of_account import StateError
 from error_of_account import CategoryOfAccountError
 from error_of_account import AccountNotFoundError
 from error_of_account import DeletePrimaryAccountError
 from error_of_account import PrimaryAccountNotFoundError
 
-from state import New
-from state import Active
-from state import Locked
-from state import Closed
-from state import Deleted
+from state import State
 
 class Account(Object):
     """Main class for creation object account"""
@@ -92,7 +89,7 @@ class Account(Object):
         if activation_datetime is not None:
             self.activation(activation_datetime=activation_datetime)
         else:
-            self.state = New()
+            self.state = State()['new']
             self.__activation_datetime = None
 
         if category is None:
@@ -166,7 +163,7 @@ class Account(Object):
             raise NotValidDateActivationError
 
         self.__activation_datetime = activation_datetime
-        self.state = Active()
+        self.state = State()['active']
 
     def close(self, close_datetime: Optional[datetime.datetime] = None):
         close_datetime = close_datetime or datetime.datetime.now()
@@ -177,11 +174,13 @@ class Account(Object):
         if self.balance != 0:
             raise BalanceIsNotZero
 
-        if self.state == Closed():
+        state_closed = State()['closed']
+
+        if self.state == state_closed:
             raise StateError
 
         self.__close_datetime = close_datetime
-        self.state = Closed()
+        self.state = state_closed
 
     @property
     def pickle(self):
@@ -193,7 +192,7 @@ class Account(Object):
 
     @property
     def active(self):
-        return Active() == self.state
+        return State()['active'] == self.state
 
     @property
     def state_id(self):
