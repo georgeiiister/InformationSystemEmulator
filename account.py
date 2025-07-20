@@ -22,7 +22,7 @@ from error_of_account import AccountNotFoundError
 from error_of_account import DeletePrimaryAccountError
 from error_of_account import PrimaryAccountNotFoundError
 
-from state import State
+from state import Factory as StateFactory
 
 class Account(Object):
     """Main class for creation object account"""
@@ -89,7 +89,7 @@ class Account(Object):
         if activation_datetime is not None:
             self.activation(activation_datetime=activation_datetime)
         else:
-            self.state = State()['new']
+            self.state = StateFactory()['new']
             self.__activation_datetime = None
 
         if category is None:
@@ -163,7 +163,7 @@ class Account(Object):
             raise NotValidDateActivationError
 
         self.__activation_datetime = activation_datetime
-        self.state = State()['active']
+        self.state = StateFactory()['active']
 
     def close(self, close_datetime: Optional[datetime.datetime] = None):
         close_datetime = close_datetime or datetime.datetime.now()
@@ -174,7 +174,7 @@ class Account(Object):
         if self.balance != 0:
             raise BalanceIsNotZero
 
-        state_closed = State()['closed']
+        state_closed = StateFactory()['closed']
 
         if self.state == state_closed:
             raise StateError
@@ -192,7 +192,7 @@ class Account(Object):
 
     @property
     def active(self):
-        return State()['active'] == self.state
+        return StateFactory()['active'] == self.state
 
     @property
     def state_id(self):
