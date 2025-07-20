@@ -52,12 +52,11 @@ class Factory(Object):
         return self
 
     def __next__(self):
-        state_of_object = None
         while self.__count < len(self.__states):
             name_of_state = list(self.__states.keys())[self.__count]
             class_of_state = self.__states.get(name_of_state)
             state_of_object = class_of_state(name = name_of_state)
             self.__count +=1
             return state_of_object
-        else:
-            raise StopIteration
+
+        raise StopIteration
