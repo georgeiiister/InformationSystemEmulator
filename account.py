@@ -119,6 +119,8 @@ class Account(Object):
             raise ActiveBalanceError
 
         self.__balance += amount
+        self.info(f'{self.account_number}({self.account_id})'
+                  f',credit_amount={amount}')
 
     def debit(self, amount: Decimal):
         if self.activation_datetime is None:
@@ -127,6 +129,8 @@ class Account(Object):
             raise RedBalanceError
 
         self.__balance -= amount
+        self.info(f'{self.account_number}({self.account_id})'
+                  f',debit_amount={amount}')
 
     @property
     def balance(self):
@@ -164,7 +168,8 @@ class Account(Object):
 
         self.__activation_datetime = activation_datetime
         self.state = StateFactory()['active']
-        self.warning(f'activation_date={self.__activation_datetime}')
+        self.info(f'{self.account_number}({self.account_id})'
+                  f',activation_date={self.__activation_datetime}')
 
     def close(self, close_datetime: Optional[datetime.datetime] = None):
         close_datetime = close_datetime or datetime.datetime.now()
@@ -182,6 +187,8 @@ class Account(Object):
 
         self.__close_datetime = close_datetime
         self.state = state_closed
+        self.info(f'{self.account_number}({self.account_id})'
+                  f',close_date={self.__close_datetime}')
 
     @property
     def pickle(self):
@@ -202,9 +209,9 @@ class Account(Object):
     def __hash__(self):
         return hash(self.account_id)
 
-    def __repr__(self):
+    def __str__(self):
         return (
-            f'Account(account_id={self.__account_id}'
+            f'account_id={self.__account_id}'
             f', balance={self.balance}'
             f', account_number={self.account_number}'
             f', state_id={self.state_id}'
@@ -213,7 +220,6 @@ class Account(Object):
             f', registration_datetime={self.registration_datetime}'
             f', activation_datetime={self.activation_datetime}'
             f', close_datetime={self.__close_datetime}'
-            f')'
         )
 
     def __del__(self):

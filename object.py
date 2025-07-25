@@ -1,7 +1,7 @@
 from abc import ABC
+from logging_manager import LoggingManager
 
 from typing import Optional
-from logging_manager import LoggingManager
 
 
 class Object(ABC):
@@ -50,13 +50,15 @@ class Object(ABC):
 
     def __repr__(self):
         return (f'{self.__class__.__name__}('
-                f'{self.__internal_id},{self.__name!r}'
+                f'{self.__internal_id}'
+                ,f',{self.__name!r}'
                 ,f'{self.__state})')
 
+    def __format_msg(self, msg):
+        return f'{self.__class__.__name__}|{msg}'
+
     def warning(self, msg, *args):
-        msg = f'{msg}'
-        self.__class__.__logger.warning(msg = msg,*args)
+        self.__class__.__logger.warning(msg = self.__format_msg(msg),*args)
 
     def info(self, msg, *args):
-        msg = f'{msg}'
-        self.__class__.__logger.info(msg = msg,*args)
+        self.__class__.__logger.info(msg = self.__format_msg(msg),*args)

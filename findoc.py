@@ -1,4 +1,5 @@
 import account
+from object import Object
 
 from decimal import Decimal
 
@@ -10,7 +11,7 @@ class FinDocAlreadyActual(FinDocError):
     pass
 
 
-class FinDoc:
+class FinDoc(Object):
     __count = 0
     __state_actual = 1
     __state_new = 0
@@ -29,6 +30,7 @@ class FinDoc:
                  , credit_account: account.Account
                  , credit_amount: Decimal
                  ):
+        Object.__init__(self)
         self.__debit_account = debit_account
         self.__debit_amount = debit_amount
         self.__credit_account = credit_account
@@ -60,6 +62,8 @@ class FinDoc:
                 self.__credit_account.debit(amount=self.__credit_amount)
 
         self.__state = FinDoc.state_actual()
+        self.info(f'{self.__debit_account}({self.__debit_amount})'
+                  f',{self.__credit_account}({self.__credit_amount}')
 
     @property
     def state(self):
