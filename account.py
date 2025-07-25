@@ -164,6 +164,7 @@ class Account(Object):
 
         self.__activation_datetime = activation_datetime
         self.state = StateFactory()['active']
+        self.warning(f'activation_date={self.__activation_datetime}')
 
     def close(self, close_datetime: Optional[datetime.datetime] = None):
         close_datetime = close_datetime or datetime.datetime.now()

@@ -1,9 +1,13 @@
-import abc
+from abc import ABC
 
 from typing import Optional
+from logging_manager import LoggingManager
 
 
-class Object(abc.ABC):
+class Object(ABC):
+
+    __logger = LoggingManager()
+
 
     def __init__(
             self
@@ -11,6 +15,7 @@ class Object(abc.ABC):
             , name: Optional[str] = None
             , state: Optional[object] = None
     ):
+        super().__init__()
         self.__internal_id = internal_id
         self.__name = name
         self.__state = state
@@ -42,3 +47,16 @@ class Object(abc.ABC):
     def __eq__(self, other):
         is_id = self.internal_id == other.internal_id # self.id == other.id ?
         return is_id and type(self) == type(other)
+
+    def __repr__(self):
+        return (f'{self.__class__.__name__}('
+                f'{self.__internal_id},{self.__name!r}'
+                ,f'{self.__state})')
+
+    def warning(self, msg, *args):
+        msg = f'{msg}'
+        self.__class__.__logger.warning(msg = msg,*args)
+
+    def info(self, msg, *args):
+        msg = f'{msg}'
+        self.__class__.__logger.info(msg = msg,*args)
