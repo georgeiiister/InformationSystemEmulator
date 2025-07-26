@@ -18,7 +18,7 @@ class LoggingManager(Logger):
     def __new__(cls, name=None, level=None):
         logger = getLogger(cls.name_logger())
         logger.setLevel(DEBUG)
-        formatter = Formatter('|%(asctime)s|%(levelname)s|'
+        formatter = Formatter('%(asctime)s|%(levelname)s|'
                               '%(message)s|')
         file_handler = FileHandler(cls.file_name_logger())
         file_handler.setFormatter(formatter)

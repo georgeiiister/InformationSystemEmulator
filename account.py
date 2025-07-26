@@ -169,7 +169,7 @@ class Account(Object):
         self.__activation_datetime = activation_datetime
         self.state = StateFactory()['active']
         self.info(f'{self.account_number}({self.account_id})'
-                  f',activation_date={self.__activation_datetime}')
+                  f', activation_date={self.__activation_datetime}')
 
     def close(self, close_datetime: Optional[datetime.datetime] = None):
         close_datetime = close_datetime or datetime.datetime.now()
@@ -188,7 +188,7 @@ class Account(Object):
         self.__close_datetime = close_datetime
         self.state = state_closed
         self.info(f'{self.account_number}({self.account_id})'
-                  f',close_date={self.__close_datetime}')
+                  f', close_date={self.__close_datetime}')
 
     @property
     def pickle(self):
