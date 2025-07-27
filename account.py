@@ -120,7 +120,7 @@ class Account(Object):
 
         self.__balance += amount
         self.info(f'{self.account_number}({self.account_id})'
-                  f',credit_amount={amount}')
+                  f', credit_amount={amount}')
 
     def debit(self, amount: Decimal):
         if self.activation_datetime is None:
@@ -181,7 +181,7 @@ class Account(Object):
             _exception = BalanceIsNotZero(f'The account {self.account_number}({self.account_id})'
                                        f' cannot be closed because the '
                                        f'account balance is greater than zero')
-            self.error(msg = _exception.name)
+            self.error(msg = _exception)
             raise _exception
 
         state_closed = StateFactory()['closed']
