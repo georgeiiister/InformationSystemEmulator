@@ -1,9 +1,10 @@
 from logging import Logger
 from logging import getLogger
 from logging import FileHandler
+from logging import StreamHandler
 from logging import Formatter
 from logging import DEBUG
-
+from logging import ERROR
 
 class LoggingManager(Logger):
 
@@ -18,10 +19,11 @@ class LoggingManager(Logger):
     def __new__(cls, name=None, level=None):
         logger = getLogger(cls.name_logger())
         logger.setLevel(DEBUG)
-        formatter = Formatter('%(asctime)s|%(levelname)s|'
+        file_formatter = Formatter('%(asctime)s|%(levelname)s|'
                               '%(message)s')
         file_handler = FileHandler(cls.file_name_logger())
-        file_handler.setFormatter(formatter)
+        file_handler.setFormatter(file_formatter)
+        file_handler.setLevel(DEBUG)
         logger.addHandler(file_handler)
         return logger
 

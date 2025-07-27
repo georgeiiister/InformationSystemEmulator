@@ -4,6 +4,8 @@ from account import Account
 from decimal import Decimal
 from account import Accounts
 
+from error_of_account import BalanceIsNotZero
+
 def print_info_account(balance, state, account_id):
     print('|balance:', f'{balance:>9}',
           '|state:', f'{state:<6}',
@@ -48,6 +50,10 @@ for account in acc_pool_balance:
                        account_id=account.account_id)
 # debit
 
-for account in acc_pool_balance:
-    account.debit(amount=account.balance)
-    account.close()
+for i, account in enumerate(acc_pool_balance):
+    try:
+        if i>0:
+            account.debit(amount=account.balance)
+        account.close()
+    except BalanceIsNotZero:
+        pass

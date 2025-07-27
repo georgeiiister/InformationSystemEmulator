@@ -178,7 +178,11 @@ class Account(Object):
             raise NotValidDateCloseError
 
         if self.balance != 0:
-            raise BalanceIsNotZero
+            _exception = BalanceIsNotZero(f'The account {self.account_number}({self.account_id})'
+                                       f' cannot be closed because the '
+                                       f'account balance is greater than zero')
+            self.error(msg = _exception.name)
+            raise _exception
 
         state_closed = StateFactory()['closed']
 
