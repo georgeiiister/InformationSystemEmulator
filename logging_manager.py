@@ -23,7 +23,6 @@ class LoggingManager(Logger):
                               '%(message)s')
         file_handler = FileHandler(cls.file_name_logger())
         file_handler.setFormatter(file_formatter)
-        file_handler.setLevel(DEBUG)
         logger.addHandler(file_handler)
         return logger
 
