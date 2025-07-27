@@ -19,7 +19,7 @@ class LoggingManager(Logger):
         logger = getLogger(cls.name_logger())
         logger.setLevel(DEBUG)
         formatter = Formatter('%(asctime)s|%(levelname)s|'
-                              '%(message)s|')
+                              '%(message)s')
         file_handler = FileHandler(cls.file_name_logger())
         file_handler.setFormatter(formatter)
         logger.addHandler(file_handler)
@@ -30,3 +30,6 @@ class LoggingManager(Logger):
 
     def info(self, msg, *args):
         super().info(msg,*args)
+
+    def error(self, msg, *args):
+        super().error(msg,*args)

@@ -130,7 +130,7 @@ class Account(Object):
 
         self.__balance -= amount
         self.info(f'{self.account_number}({self.account_id})'
-                  f',debit_amount={amount}')
+                  f', debit_amount={amount}')
 
     @property
     def balance(self):

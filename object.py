@@ -62,3 +62,6 @@ class Object(ABC):
 
     def info(self, msg, *args):
         self.__class__.__logger.info(msg = self.__format_msg(msg),*args)
+
+    def error(self, msg, *args):
+        self.__class__.__logger.error(msg = self.__format_msg(msg),*args)
