@@ -6,6 +6,9 @@ from logging import Formatter
 from logging import DEBUG
 from logging import ERROR
 
+from systemd.journal import stream
+
+
 class LoggingManager(Logger):
 
     @staticmethod
@@ -24,6 +27,10 @@ class LoggingManager(Logger):
         file_handler = FileHandler(cls.file_name_logger())
         file_handler.setFormatter(file_formatter)
         logger.addHandler(file_handler)
+
+        stream_handler = StreamHandler()
+        stream_handler.setLevel(ERROR)
+        logger.addHandler(stream_handler)
         return logger
 
     def warning(self, msg, *args):

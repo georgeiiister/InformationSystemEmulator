@@ -52,8 +52,17 @@ for account in acc_pool_balance:
 
 for i, account in enumerate(acc_pool_balance):
     try:
-        if i>0:
+        if i>1:
             account.debit(amount=account.balance)
+    except BalanceIsNotZero:
+        pass
+
+print('close accounts')
+for account in acc_pool_balance:
+    try:
         account.close()
     except BalanceIsNotZero:
         pass
+    print_info_account(balance=account.balance,
+                       state=account.state_id,
+                       account_id=account.account_id)
