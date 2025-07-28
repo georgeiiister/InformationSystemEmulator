@@ -28,9 +28,9 @@ class LoggingManager(Logger):
         file_handler.setFormatter(file_formatter)
         logger.addHandler(file_handler)
 
-        stream_handler = StreamHandler()
-        stream_handler.setLevel(ERROR)
-        logger.addHandler(stream_handler)
+        #stream_handler = StreamHandler()
+        #stream_handler.setLevel(ERROR)
+        #logger.addHandler(stream_handler)
         return logger
 
     def warning(self, msg, *args):
