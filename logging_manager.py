@@ -6,8 +6,6 @@ from logging import Formatter
 from logging import DEBUG
 from logging import ERROR
 
-from systemd.journal import stream
-
 
 class LoggingManager(Logger):
 

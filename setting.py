@@ -1,10 +1,11 @@
 class ReferenceSetting:
     __setting = {
-                "global_debug": True,
-                "program_name": ["information", "system", "emulator"],
-                "path_to_working_files_of_system": 'ISE_WorkingFiles',
-                "path_to_db_files_of_system": 'ISE_DB'
-                }
+        "global_debug": True,
+        "program_name": ["information", "system", "emulator"],
+        "path_to_working_files_of_system": 'ISE_WorkingFiles',
+        "path_to_db_files_of_system": 'ISE_DB'
+    }
+
     def __init__(self):
         self.__value = ReferenceSetting.__setting
 
@@ -15,13 +16,14 @@ class ReferenceSetting:
     def setting(self, setting_name):
         return self.__value.get(setting_name)
 
+
 class InitialSettings:
-    def __init__(self,setting_file=None):
+    def __init__(self, setting_file=None):
         self.__reference_setting = ReferenceSetting()
-        self.__program_name = self.__reference_setting.setting(setting_name = 'program_name')
-        self.__path_to_working_files_of_system = self.__reference_setting.setting(setting_name =
+        self.__program_name = self.__reference_setting.setting(setting_name='program_name')
+        self.__path_to_working_files_of_system = self.__reference_setting.setting(setting_name=
                                                                                   'path_to_working_files_of_system')
-        self.__path_to_db_files_of_system = self.__reference_setting.setting(setting_name =
+        self.__path_to_db_files_of_system = self.__reference_setting.setting(setting_name=
                                                                              'path_to_db_files_of_system')
 
     @property

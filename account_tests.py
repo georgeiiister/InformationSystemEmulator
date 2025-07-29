@@ -8,22 +8,22 @@ from decimal import Decimal
 
 from error_of_account import BalanceIsNotZero
 
-class TestAccount(unittest.TestCase):
 
+class TestAccount(unittest.TestCase):
     number_of_accounts = range(10)
     __accounts = tuple()
-    __slice_of_pool = slice(0,0)
+    __slice_of_pool = slice(0, 0)
     __accounts_for_activation = tuple()
     __print_info = False
 
     @staticmethod
-    def __print_info_by_account(_account:Account):
+    def __print_info_by_account(_account: Account):
         print('|balance:', f'{_account.balance:>9}',
               '|state:', f'{_account.state_id:<6}',
               '|id:', f'{_account.account_id:>3}|')
 
     @classmethod
-    def __print_pool_of_accounts(cls,pool_account,header):
+    def __print_pool_of_accounts(cls, pool_account, header):
         if cls.__print_info:
             print(header)
             for item_account in pool_account:
@@ -33,7 +33,7 @@ class TestAccount(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.__accounts = tuple((Account()
-                                   for i in cls.number_of_accounts))
+                                for i in cls.number_of_accounts))
 
         cls.__slice_of_pool = slice(0, int(len(cls.__accounts) / 2))
         cls.__accounts_for_activation = cls.__accounts[cls.__slice_of_pool]
@@ -45,16 +45,16 @@ class TestAccount(unittest.TestCase):
         __accounts = self.__class__.__accounts_for_activation
         for item_account in __accounts:
             item_account.activation()
-            self.assertEqual(item_account.state,StateFactory()['active'])
+            self.assertEqual(item_account.state, StateFactory()['active'])
         _header = 'it is accounts activated:'
         self.__class__.__print_pool_of_accounts(pool_account=__accounts
-                                                ,header = _header)
+                                                , header=_header)
 
     def test_002_top_up_account(self):
         __accounts = self.__class__.__accounts_for_activation
         for item_account in __accounts:
             amount_of_account = Decimal(str(round(random.randint(1, 1000_000)
-                                                    * random.random(), 2)))
+                                                  * random.random(), 2)))
             item_account.credit(amount=amount_of_account)
             self.assertEqual(item_account.balance, amount_of_account)
 
@@ -81,6 +81,7 @@ class TestAccount(unittest.TestCase):
 
         self.__class__.__print_pool_of_accounts(pool_account=__accounts
                                                 , header='close of accounts:')
+
 
 if __name__ == '__main__':
     unittest.main()
