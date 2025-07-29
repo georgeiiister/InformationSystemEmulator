@@ -33,7 +33,7 @@ class TestAccount(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.__accounts = tuple((Account()
-                                for i in cls.number_of_accounts))
+                                for _ in cls.number_of_accounts))
 
         cls.__slice_of_pool = slice(0, int(len(cls.__accounts) / 2))
         cls.__accounts_for_activation = cls.__accounts[cls.__slice_of_pool]
@@ -47,8 +47,8 @@ class TestAccount(unittest.TestCase):
             item_account.activation()
             self.assertEqual(item_account.state, StateFactory()['active'])
         _header = 'it is accounts activated:'
-        self.__class__.__print_pool_of_accounts(pool_account=__accounts
-                                                , header=_header)
+        self.__class__.__print_pool_of_accounts(pool_account=__accounts,
+                                                header=_header)
 
     def test_002_top_up_account(self):
         __accounts = self.__class__.__accounts_for_activation
@@ -58,16 +58,16 @@ class TestAccount(unittest.TestCase):
             item_account.credit(amount=amount_of_account)
             self.assertEqual(item_account.balance, amount_of_account)
 
-        self.__class__.__print_pool_of_accounts(pool_account=__accounts
-                                                , header='credit operation:')
+        self.__class__.__print_pool_of_accounts(pool_account=__accounts,
+                                                header='credit operation:')
 
     def test_003_debit_account(self):
         __accounts = self.__class__.__accounts_for_activation
         for item_account in __accounts[2:]:
             item_account.debit(amount=item_account.balance)
 
-        self.__class__.__print_pool_of_accounts(pool_account=__accounts
-                                                , header='debit operation:')
+        self.__class__.__print_pool_of_accounts(pool_account=__accounts,
+                                                header='debit operation:')
 
     def test_004_close_account(self):
         __accounts = self.__class__.__accounts_for_activation
@@ -79,8 +79,8 @@ class TestAccount(unittest.TestCase):
             else:
                 self.assertEqual(item_account.state, StateFactory()['closed'])
 
-        self.__class__.__print_pool_of_accounts(pool_account=__accounts
-                                                , header='close of accounts:')
+        self.__class__.__print_pool_of_accounts(pool_account=__accounts,
+                                                header='close of accounts:')
 
 
 if __name__ == '__main__':
