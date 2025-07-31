@@ -4,7 +4,7 @@ from logging_manager import LoggingManager
 from typing import Optional
 
 
-class Object(ABC):
+class ISObject(ABC):
 
     __logger = LoggingManager()
 

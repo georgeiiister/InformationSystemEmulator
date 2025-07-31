@@ -1,5 +1,5 @@
 import account
-from object import Object
+from object import ISObject
 
 from decimal import Decimal
 
@@ -11,7 +11,7 @@ class FinDocAlreadyActual(FinDocError):
     pass
 
 
-class FinDoc(Object):
+class FinDoc(ISObject):
     __count = 0
     __state_actual = 1
     __state_new = 0
@@ -30,7 +30,7 @@ class FinDoc(Object):
                  , credit_account: account.Account
                  , credit_amount: Decimal
                  ):
-        Object.__init__(self)
+        ISObject.__init__(self)
         self.__debit_account = debit_account
         self.__debit_amount = debit_amount
         self.__credit_account = credit_account

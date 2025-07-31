@@ -1,29 +1,29 @@
-from object import Object
+from object import ISObject
 from error import StateError
 
-class Factory(Object):
+class Factory(ISObject):
 
-    class New(Object):
+    class New(ISObject):
         def __init__(self, name):
             super().__init__(internal_id = 0, name = None, state = None)
 
 
-    class Active(Object):
+    class Active(ISObject):
         def __init__(self, name):
             super().__init__(internal_id = 1, name = None, state = None)
 
 
-    class Locked(Object):
+    class Locked(ISObject):
         def __init__(self, name):
             super().__init__(internal_id = 2, name = None, state = None)
 
 
-    class Closed(Object):
+    class Closed(ISObject):
         def __init__(self, name):
             super().__init__(internal_id = 3, name = None, state = None)
 
 
-    class Deleted(Object):
+    class Deleted(ISObject):
         def __init__(self, name):
             super().__init__(internal_id = 4, name = None, state = None)
 

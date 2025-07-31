@@ -1,13 +1,18 @@
 import datetime
+
+from markdown_it.common.html_re import attribute
+
 import seq
 import pickle
+import json
+import copy
 
 from typing import Optional
 from typing import Dict
 from typing import List
 from typing import Iterable
 from decimal import Decimal
-from object import Object
+from object import ISObject
 
 from error import StateError
 
@@ -24,7 +29,7 @@ from error_of_account import PrimaryAccountNotFoundError
 
 from state import Factory as StateFactory
 
-class Account(Object):
+class Account(ISObject):
     """Main class for creation object account"""
 
     __count = 0
@@ -70,7 +75,7 @@ class Account(Object):
     ) -> None:
 
         Account.__internal_id = next(Account.__internal_generator_id)
-        Object.__init__(self, internal_id=Account.__internal_id)
+        ISObject.__init__(self, internal_id=Account.__internal_id)
 
         self.__account_id = account_id
         self.__balance = balance
@@ -235,8 +240,27 @@ class Account(Object):
     def __exit__(self, exc_type=None, exc_val=None, exc_tb=None):
         self.__lock = False
 
+    @property
+    def __easy_dict(self):
+        attributes_for_change_value = (attribute_name for attribute_name,value
+                                       in self.__dict__.items()
+                                       if issubclass(type(value), ISObject))
 
-class Accounts(Object):
+        copy_of_dict = copy.deepcopy(self.__dict__)
+
+        for attribute_name in attributes_for_change_value:
+            copy_of_dict[attribute_name]='Object'
+
+        return copy_of_dict
+
+    @property
+    def raw_json(self):
+        dumps = json.dumps(self.__easy_dict)
+        self.info(msg=f'account_json_view={dumps}')
+        return dumps
+
+
+class Accounts(ISObject):
     """Main class for creation collection of accounts"""
 
     __slots__ = (
@@ -258,7 +282,7 @@ class Accounts(Object):
             accounts_collection_id: Optional[int] = None
     ):
 
-        Object.__init__(self, internal_id=next(Accounts.__internal_generator_id))
+        ISObject.__init__(self, internal_id=next(Accounts.__internal_generator_id))
 
         self.__collection_id = accounts_collection_id
         self.__accounts_by_id: Dict[Account.account_id, Account] = dict()

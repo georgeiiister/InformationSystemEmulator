@@ -1,10 +1,10 @@
 import pickle
 
 from typing import Optional
-from object import Object
+from object import ISObject
 
 
-class Seq(Object):
+class Seq(ISObject):
     __begin = 1
     __end = 100_000_000_000
     __step = 1
@@ -16,7 +16,7 @@ class Seq(Object):
                  , end: Optional[int] = None
                  , step: Optional[int] = None
                  ):
-        Object.__init__(self)
+        ISObject.__init__(self)
         self.__begin = begin or Seq.__begin
         self.__end = end or Seq.__end
         self.__step = step or Seq.__step

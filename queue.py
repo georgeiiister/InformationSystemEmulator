@@ -2,10 +2,10 @@ import uuid
 import pickle
 import seq
 
-from object import Object
+from object import ISObject
 from typing import Optional
 
-class Queue(Object):
+class Queue(ISObject):
     class QueueError(Exception):
         pass
 
@@ -26,7 +26,7 @@ class Queue(Object):
         return cls.__error_if_lock
 
     def __init__(self, size:int, error_if_lock:Optional[bool] = None):
-        Object.__init__(self)
+        ISObject.__init__(self)
 
         self.__size = size
         self.__queue = []

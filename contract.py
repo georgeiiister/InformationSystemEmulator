@@ -2,9 +2,9 @@ import account
 import person
 import legalperson
 
-from object import Object
+from object import ISObject
 
-class Contract(Object):
+class Contract(ISObject):
     """Main class for create object contract"""
 
     def __init__(self
@@ -13,7 +13,7 @@ class Contract(Object):
                  , owner: object
                  , accounts: account.Accounts
                  ):
-        Object.__init__(self)
+        ISObject.__init__(self)
 
         self.__contract_id = contract_id
         self.__accounts = accounts

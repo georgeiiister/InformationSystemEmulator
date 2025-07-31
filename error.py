@@ -1,7 +1,7 @@
-from object import Object
+from object import ISObject
 
 
-class InformationSystemError(Exception,Object):
+class InformationSystemError(Exception, ISObject):
     pass
 
 
