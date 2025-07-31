@@ -1,3 +1,4 @@
+import json
 from abc import ABC
 from logging_manager import LoggingManager
 
@@ -65,3 +66,9 @@ class ISObject(ABC):
 
     def error(self, msg, *args):
         self.__class__.__logger.error(msg = self.__format_msg(msg),*args)
+
+    @property
+    def raw_json(self):
+        dumps = json.dumps(self.__dict__, default=lambda obj: obj.json)
+        self.info(msg=f'account_json_view={dumps}')
+        return dumps

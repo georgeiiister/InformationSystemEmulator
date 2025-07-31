@@ -240,25 +240,6 @@ class Account(ISObject):
     def __exit__(self, exc_type=None, exc_val=None, exc_tb=None):
         self.__lock = False
 
-    @property
-    def __easy_dict(self):
-        attributes_for_change_value = (attribute_name for attribute_name,value
-                                       in self.__dict__.items()
-                                       if issubclass(type(value), ISObject))
-
-        copy_of_dict = copy.deepcopy(self.__dict__)
-
-        for attribute_name in attributes_for_change_value:
-            copy_of_dict[attribute_name]='Object'
-
-        return copy_of_dict
-
-    @property
-    def raw_json(self):
-        dumps = json.dumps(self.__easy_dict)
-        self.info(msg=f'account_json_view={dumps}')
-        return dumps
-
 
 class Accounts(ISObject):
     """Main class for creation collection of accounts"""
