@@ -240,12 +240,12 @@ class Account(ISObject):
             'account_id': self.__account_id
             ,'balance': self.balance2str
             ,'account_number': self.account_number
-            ,'state_id':self.state_id
+            ,'state_id': self.state_id
             ,'account_collection':None
-            ,'describe':self.describe
-            ,'registration_datetime':self.registration_datetime2str
-            ,'activation_datetime':self.activation_datetime2str
-            ,'close_datetime':self.close_datetime2str
+            ,'describe': self.describe
+            ,'registration_datetime': self.registration_datetime2str
+            ,'activation_datetime': self.activation_datetime2str
+            ,'close_datetime': self.close_datetime2str
         }
 
     def __str__(self):
