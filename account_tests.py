@@ -1,7 +1,6 @@
 import random
 import unittest
 import json
-from json.decoder import JSONObject
 
 from account import Account
 from state import Factory as StateFactory
