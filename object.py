@@ -69,6 +69,6 @@ class ISObject(ABC):
 
     @property
     def raw_json(self):
-        dumps = json.dumps(self.__dict__, default=lambda obj: obj.json)
+        dumps = json.dumps(self.__dict__, default=lambda obj: obj.raw_json)
         self.info(msg=f'account_json_view={dumps}')
         return dumps
