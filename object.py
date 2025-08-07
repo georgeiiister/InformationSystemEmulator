@@ -1,4 +1,6 @@
 import json
+import datetime
+import decimal
 from abc import ABC
 from logging_manager import LoggingManager
 
@@ -8,6 +10,19 @@ from typing import Optional
 class ISObject(ABC):
 
     __logger = LoggingManager()
+
+    @staticmethod
+    def date_time2str(value:datetime, mask='%d.%m.%Y %H:%M:%S')->Optional[None|str]:
+        result = None
+        try:
+            result = value.strftime(mask)
+        except AttributeError:
+            pass
+        return result
+
+    @staticmethod
+    def decimal2str(value:decimal)->Optional[None|str]:
+        return f'{value:>.2}'
 
 
     def __init__(
@@ -68,7 +83,7 @@ class ISObject(ABC):
         self.__class__.__logger.error(msg = self.__format_msg(msg),*args)
 
     @property
-    def raw_json(self):
-        dumps = json.dumps(self.__dict__, default=lambda obj: obj.raw_json)
+    def raw_jsons(self):
+        dumps = json.dumps(self.__dict__, default=lambda obj: obj.raw_jsons)
         self.info(msg=f'account_json_view={dumps}')
         return dumps

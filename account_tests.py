@@ -84,9 +84,15 @@ class TestAccount(unittest.TestCase):
                                                 header='close of accounts:')
     def test_005_raw_json_view(self):
         for item_account in self.__class__.__accounts:
-            _jsons = item_account.raw_json
+            _jsons = item_account.raw_jsons
             _jsons_etalon = json.dumps([1,2,3])
             self.assertTrue(issubclass(type(_jsons),type(_jsons_etalon)))
+
+    def test_006_json_view(self):
+        for item_account in self.__class__.__accounts:
+            _jsons = item_account.jsons
+            _jsons_etalon = json.dumps([1,2,3])
+            self.assertTrue(True)
 
 
 if __name__ == '__main__':

@@ -1,11 +1,8 @@
 import datetime
 
-from markdown_it.common.html_re import attribute
-
 import seq
 import pickle
 import json
-import copy
 
 from typing import Optional
 from typing import Dict
@@ -200,6 +197,10 @@ class Account(ISObject):
                   f', close_date={self.__close_datetime}')
 
     @property
+    def close_datetime(self):
+        return self.__close_datetime
+
+    @property
     def pickle(self):
         return self.account_id, pickle.dumps(self)
 
@@ -215,21 +216,46 @@ class Account(ISObject):
     def state_id(self):
         return self.state.internal_id
 
+    @property
+    def balance2str(self):
+        return super().decimal2str(self.balance)
+
+    @property
+    def registration_datetime2str(self):
+        return super().date_time2str(self.registration_datetime)
+
+    @property
+    def activation_datetime2str(self):
+        return super().date_time2str(self.activation_datetime)
+
+    @property
+    def close_datetime2str(self):
+        return super().date_time2str(self.close_datetime)
+
     def __hash__(self):
         return hash(self.account_id)
 
+    def _dict(self):
+        return {
+            'account_id': self.__account_id
+            ,'balance': self.balance2str
+            ,'account_number': self.account_number
+            ,'state_id':self.state_id
+            ,'account_collection':None
+            ,'describe':self.describe
+            ,'registration_datetime':self.registration_datetime2str
+            ,'activation_datetime':self.activation_datetime2str
+            ,'close_datetime':self.close_datetime2str
+        }
+
     def __str__(self):
-        return (
-            f'account_id={self.__account_id}'
-            f', balance={self.balance}'
-            f', account_number={self.account_number}'
-            f', state_id={self.state_id}'
-            f', account_collection={self.collection}'
-            f', describe={self.describe}'
-            f', registration_datetime={self.registration_datetime}'
-            f', activation_datetime={self.activation_datetime}'
-            f', close_datetime={self.__close_datetime}'
-        )
+        return str(self._dict())
+
+    @property
+    def jsons(self):
+        dumps = json.dumps(self._dict())
+        self.info(msg=f'account_json_view={dumps}')
+        return dumps
 
     def __del__(self):
         Account.__count -= 1
