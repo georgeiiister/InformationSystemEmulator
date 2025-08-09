@@ -309,7 +309,8 @@ class Accounts(ISObject):
 
         Accounts.__count += 1
 
-    def __add_account(self, account: Account, primary: bool = False):  # add as primary account in collection
+    # add as primary account in collection
+    def __add_account(self, account: Account, primary: bool = False):
         """Method for add object account to this account collection"""
         self.__accounts_by_id[account.account_id] = account
         self.__accounts_numbers.append(account.account_number)
@@ -322,7 +323,10 @@ class Accounts(ISObject):
         # set on account link to this collection
         account.set_collection(value=self, id_in_collection=item_id)
 
-    def add_account(self, accounts: Iterable[Account] | Account, primary_id: Optional[Account.account_id]):
+    def add_account(self
+                    , accounts: Iterable[Account] | Account
+                    , primary_id: Optional[Account.account_id]
+                    ):
         try:
             for account in accounts:
                 self.__add_account(
@@ -364,7 +368,9 @@ class Accounts(ISObject):
         item_id: Optional[int] = -1
         try:
             while True:
-                item_id = self.__accounts_numbers.index(account_number, item_id + 1)
+                item_id = self.__accounts_numbers.index(account_number
+                                                        , item_id + 1
+                                                        )
                 result.append(self.account_by_item_id(item_id))
         except ValueError:
             if not result:
