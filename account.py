@@ -1,5 +1,3 @@
-import datetime
-
 import seq
 import pickle
 import json
@@ -8,8 +6,9 @@ from typing import Optional
 from typing import Dict
 from typing import List
 from typing import Iterable
-from decimal import Decimal
 from object import ISObject
+from date import DateAndTime
+from currency import Currency
 
 from error import StateError
 
@@ -64,11 +63,11 @@ class Account(ISObject):
             self,
             account_number: str = None,
             category: int = None,
-            balance: Decimal = Decimal('0'),
+            balance: Currency = Currency('0'),
             account_id: Optional[int] = None,
             describe: Optional[str] = None,
-            registration_datetime: datetime.datetime = datetime.datetime.now(),
-            activation_datetime: Optional[datetime.datetime] = None
+            registration_datetime: DateAndTime = DateAndTime.now(),
+            activation_datetime: Optional[DateAndTime] = None
     ) -> None:
 
         Account.__internal_id = next(Account.__internal_generator_id)
@@ -114,7 +113,7 @@ class Account(ISObject):
         self.__collection = value
         self.__id_in_collection = id_in_collection
 
-    def credit(self, amount: Decimal) -> None:
+    def credit(self, amount: Currency) -> None:
         if self.activation_datetime is None:
             raise NotSetDateBeginOfAction
         if abs(self.__balance) < amount and self.__category == Account.__active_account:
@@ -124,7 +123,7 @@ class Account(ISObject):
         self.info(f'{self.account_number}({self.account_id})'
                   f', credit_amount={amount}')
 
-    def debit(self, amount: Decimal):
+    def debit(self, amount: Currency):
         if self.activation_datetime is None:
             raise NotSetDateBeginOfAction
         if self.__balance < amount and self.__category == Account.__passive_account:
@@ -162,8 +161,8 @@ class Account(ISObject):
     def activation_datetime(self):
         return self.__activation_datetime
 
-    def activation(self, activation_datetime: Optional[datetime.datetime] = None):
-        activation_datetime = activation_datetime or datetime.datetime.now()
+    def activation(self, activation_datetime: Optional[DateAndTime] = None):
+        activation_datetime = activation_datetime or DateAndTime.now()
 
         if self.registration_datetime > activation_datetime:
             raise NotValidDateActivationError
@@ -173,8 +172,8 @@ class Account(ISObject):
         self.info(f'{self.account_number}({self.account_id})'
                   f', activation_date={self.__activation_datetime}')
 
-    def close(self, close_datetime: Optional[datetime.datetime] = None):
-        close_datetime = close_datetime or datetime.datetime.now()
+    def close(self, close_datetime: Optional[DateAndTime] = None):
+        close_datetime = close_datetime or DateAndTime.now()
 
         if self.registration_datetime > close_datetime:
             raise NotValidDateCloseError
@@ -216,44 +215,50 @@ class Account(ISObject):
     def state_id(self):
         return self.state.internal_id
 
-    @property
-    def balance2str(self):
-        return super().decimal2str(self.balance)
-
-    @property
-    def registration_datetime2str(self):
-        return super().date_time2str(self.registration_datetime)
-
-    @property
-    def activation_datetime2str(self):
-        return super().date_time2str(self.activation_datetime)
-
-    @property
-    def close_datetime2str(self):
-        return super().date_time2str(self.close_datetime)
-
     def __hash__(self):
         return hash(self.account_id)
 
-    def _dict(self):
+    @property
+    def dict_view(self):
         return {
             'account_id': self.__account_id
-            ,'balance': self.balance2str
+            ,'balance': self.balance
             ,'account_number': self.account_number
             ,'state_id': self.state_id
-            ,'account_collection':None
+            ,'account_collection': self.__collection
             ,'describe': self.describe
-            ,'registration_datetime': self.registration_datetime2str
-            ,'activation_datetime': self.activation_datetime2str
-            ,'close_datetime': self.close_datetime2str
+            ,'registration_datetime': self.registration_datetime
+            ,'activation_datetime': self.activation_datetime
+            ,'close_datetime': self.close_datetime
         }
 
     def __str__(self):
-        return str(self._dict())
+        return str(self.dict_view)
 
     @property
     def jsons(self):
-        dumps = json.dumps(self._dict())
+        result = self.dict_view
+        json_time = None
+        class_name = None
+        result['balance'] = float(result['balance'])
+        class_name = result['account_collection'].__class__.__name__
+        result['account_collection'] = class_name
+        try:
+            json_time = result['registration_datetime'].json_time()
+            result['registration_datetime'] = json_time
+        except AttributeError:
+            pass
+        try:
+            json_time = result['activation_datetime'].json_time()
+            result['activation_datetime'] = json_time
+        except AttributeError:
+            pass
+        try:
+            json_time = result['close_datetime'].json_time()
+            result['close_datetime'] = json_time
+        except AttributeError:
+            pass
+        dumps = json.dumps(result,default=lambda obj: obj.raw_jsons)
         self.info(msg=f'account_json_view={dumps}')
         return dumps
 
@@ -285,7 +290,7 @@ class Accounts(ISObject):
     def __init__(
             self,
             accounts: Iterable[Account],
-            primary_id: Account.account_id,
+            primary_id: int,
             accounts_collection_id: Optional[int] = None
     ):
 
@@ -333,14 +338,14 @@ class Accounts(ISObject):
         if self.primary is None:
             raise PrimaryAccountNotFoundError
 
-    def account_by_id(self, account_id: Account.account_id) -> Account:
+    def account_by_id(self, account_id: int) -> Account:
         """Find account by internal id account"""
         result: Account = self.__accounts_by_id.get(account_id)
         if not result:
             raise AccountNotFoundError
         return result
 
-    def __del_account_by_id(self, account_id: Account.account_id):
+    def __del_account_by_id(self, account_id: int):
         account: Account = self.account_by_id(account_id=account_id)
         self.__del_account_by_item_id(item_id=account.id_in_collection)
 
@@ -353,7 +358,7 @@ class Accounts(ISObject):
         del self.__accounts_by_id[account.account_id]
         account.set_collection(value=None, id_in_collection=None)
 
-    def account_by_number(self, account_number: Account.account_number) -> List[Account]:
+    def account_by_number(self, account_number: str) -> List[Account]:
         """Find account by account number"""
         result = []
         item_id: Optional[int] = -1
@@ -366,18 +371,6 @@ class Accounts(ISObject):
                 raise AccountNotFoundError
         return result
 
-    def __getitem__(self, item):
-        """Find account by account number"""
-        result = []
-        item_id: Optional[int] = -1
-        try:
-            while True:
-                item_id = self.__accounts_numbers.index(item, item_id + 1)
-                result.append(self.account_by_item_id(item_id))
-        except ValueError:
-            if not result:
-                raise AccountNotFoundError
-        return result
 
     def account_by_item_id(self, item_id: int) -> Account:
         """Find account by item id in collection"""
@@ -392,7 +385,6 @@ class Accounts(ISObject):
         result = None
         if self.__primary_item_id:
             result = self.account_by_item_id(item_id=self.__primary_item_id)
-
         return result
 
     @primary.setter
@@ -407,10 +399,6 @@ class Accounts(ISObject):
     @property
     def accounts(self) -> Dict[int, Account]:
         return self.__accounts
-
-    @property
-    def __len__(self) -> int:
-        raise NotImplemented
 
     def __repr__(self) -> str:
         return (
@@ -431,3 +419,4 @@ class Accounts(ISObject):
     def close(self):
         for item_id in self.__accounts:
             self.__accounts.get(item_id).close()
+

@@ -1,7 +1,7 @@
 import account
 from object import ISObject
 
-from decimal import Decimal
+from currency import Decimal
 
 class FinDocError:
     pass

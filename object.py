@@ -1,6 +1,6 @@
 import json
 import datetime
-import decimal
+import currency
 from abc import ABC
 from logging_manager import LoggingManager
 
@@ -10,19 +10,6 @@ from typing import Optional
 class ISObject(ABC):
 
     __logger = LoggingManager()
-
-    @staticmethod
-    def date_time2str(value:datetime, mask='%d.%m.%Y %H:%M:%S')->Optional[None|str]:
-        result = None
-        try:
-            result = value.strftime(mask)
-        except AttributeError:
-            pass
-        return result
-
-    @staticmethod
-    def decimal2str(value:decimal)->Optional[None|str]:
-        return f'{value:>.2}'
 
 
     def __init__(

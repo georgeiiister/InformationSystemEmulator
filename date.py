@@ -1,9 +1,16 @@
 from datetime import datetime
 from datetime import date
-from object import ISObject
 
-class ISDateTime(datetime,ISObject):
-    pass
+class DateAndTime(datetime):
+    def_mask = '%d.%m.%Y %H:%M:%S'
+    json_mask = '%Y-%m-%dT%H:%M:%S'
 
-class ISDate(date):
+    def __str__(self):
+        return self.strftime(self.__class__.def_mask)
+    def json_time(self):
+        return self.strftime(self.__class__.json_mask)
+
+
+
+class OnlyDate(date):
     pass

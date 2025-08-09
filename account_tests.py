@@ -3,9 +3,10 @@ import unittest
 import json
 
 from account import Account
+from account import Accounts
 from state import Factory as StateFactory
 
-from decimal import Decimal
+from currency import Decimal
 
 from error_of_account import BalanceIsNotZero
 
@@ -13,6 +14,7 @@ from error_of_account import BalanceIsNotZero
 class TestAccount(unittest.TestCase):
     number_of_accounts = range(10)
     __accounts = tuple()
+    __account_collection = None
     __slice_of_pool = slice(0, 0)
     __accounts_for_activation = tuple()
     __print_info = False
@@ -35,6 +37,7 @@ class TestAccount(unittest.TestCase):
     def setUpClass(cls):
         cls.__accounts = tuple((Account()
                                 for _ in cls.number_of_accounts))
+        cls.__account_collection = Accounts(cls.__accounts, primary_id=cls.__accounts[0].account_id)
 
         cls.__slice_of_pool = slice(0, int(len(cls.__accounts) / 2))
         cls.__accounts_for_activation = cls.__accounts[cls.__slice_of_pool]
@@ -44,6 +47,7 @@ class TestAccount(unittest.TestCase):
 
     def test_001_activation_of_account(self):
         __accounts = self.__class__.__accounts_for_activation
+
         for item_account in __accounts:
             item_account.activation()
             self.assertEqual(item_account.state, StateFactory()['active'])
@@ -53,6 +57,7 @@ class TestAccount(unittest.TestCase):
 
     def test_002_top_up_account(self):
         __accounts = self.__class__.__accounts_for_activation
+
         for item_account in __accounts:
             amount_of_account = Decimal(str(round(random.randint(1, 1000_000)
                                                   * random.random(), 2)))
@@ -64,6 +69,7 @@ class TestAccount(unittest.TestCase):
 
     def test_003_debit_account(self):
         __accounts = self.__class__.__accounts_for_activation
+
         for item_account in __accounts[2:]:
             item_account.debit(amount=item_account.balance)
 
@@ -72,6 +78,7 @@ class TestAccount(unittest.TestCase):
 
     def test_004_close_account(self):
         __accounts = self.__class__.__accounts_for_activation
+
         for item_account in __accounts:
             try:
                 item_account.close()
@@ -93,7 +100,6 @@ class TestAccount(unittest.TestCase):
             _jsons = item_account.jsons
             _jsons_etalon = json.dumps([1,2,3])
             self.assertTrue(True)
-
 
 if __name__ == '__main__':
     unittest.main()
