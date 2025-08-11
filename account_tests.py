@@ -89,17 +89,19 @@ class TestAccount(unittest.TestCase):
 
         self.__class__.__print_pool_of_accounts(pool_account=__accounts,
                                                 header='close of accounts:')
+
     def test_005_raw_json_view(self):
         for item_account in self.__class__.__accounts:
             _jsons = item_account.raw_jsons
-            _jsons_etalon = json.dumps([1,2,3])
-            self.assertTrue(issubclass(type(_jsons),type(_jsons_etalon)))
+            _jsons_sample = json.dumps([1, 2, 3])
+            self.assertTrue(issubclass(type(_jsons), type(_jsons_sample)))
 
     def test_006_json_view(self):
         for item_account in self.__class__.__accounts:
             _jsons = item_account.jsons
-            _jsons_etalon = json.dumps([1,2,3])
-            self.assertTrue(True)
+            _jsons_sample = json.dumps([1, 2, 3])
+            self.assertTrue(issubclass(type(_jsons), type(_jsons_sample)))
+
 
 if __name__ == '__main__':
     unittest.main()
