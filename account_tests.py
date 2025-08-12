@@ -126,7 +126,7 @@ class TestAccounts(unittest.TestCase):
     def test_000_create_accounts(self):
         pass
 
-    def test_001_create_collections(self):
+    def test_001_create_collections_of_accounts(self):
         pass
 
 
