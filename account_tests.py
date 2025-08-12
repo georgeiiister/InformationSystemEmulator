@@ -41,7 +41,7 @@ class TestAccount(unittest.TestCase):
                                                        , primary_id=cls.__accounts[0].account_id)
 
         cls.__slice_of_pool = slice(0, int(len(cls.__accounts) / 2))
-        cls__accounts_for_activation = cls.__accounts[cls.__slice_of_pool]
+        cls.__accounts_for_activation = cls.__accounts[cls.__slice_of_pool]
 
         cls.__print_pool_of_accounts(pool_account=cls.__accounts,
                                                 header='pool of accounts:')
