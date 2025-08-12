@@ -12,7 +12,7 @@ from error_of_account import BalanceIsNotZero
 
 
 class TestAccount(unittest.TestCase):
-    number_of_accounts = range(10)
+    __number_of_accounts = range(10)
     __accounts = tuple()
     __account_collection = None
     __slice_of_pool = slice(0, 0)
@@ -36,16 +36,20 @@ class TestAccount(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.__accounts = tuple((Account()
-                                for _ in cls.number_of_accounts))
-        cls.__account_collection = Accounts(cls.__accounts, primary_id=cls.__accounts[0].account_id)
+                                           for _ in cls.__number_of_accounts))
+        cls.__account_collection = Accounts(cls.__accounts
+                                                       , primary_id=cls.__accounts[0].account_id)
 
         cls.__slice_of_pool = slice(0, int(len(cls.__accounts) / 2))
-        cls.__accounts_for_activation = cls.__accounts[cls.__slice_of_pool]
+        cls__accounts_for_activation = cls.__accounts[cls.__slice_of_pool]
 
         cls.__print_pool_of_accounts(pool_account=cls.__accounts,
-                                     header='pool of accounts:')
+                                                header='pool of accounts:')
 
-    def test_001_activation_of_account(self):
+    def test_000_create_accounts(self):
+        pass
+
+    def test_001_activation_of_accounts(self):
         __accounts = self.__class__.__accounts_for_activation
 
         for item_account in __accounts:
@@ -55,7 +59,7 @@ class TestAccount(unittest.TestCase):
         self.__class__.__print_pool_of_accounts(pool_account=__accounts,
                                                 header=_header)
 
-    def test_002_top_up_account(self):
+    def test_002_top_up_accounts(self):
         __accounts = self.__class__.__accounts_for_activation
 
         for item_account in __accounts:
@@ -67,7 +71,7 @@ class TestAccount(unittest.TestCase):
         self.__class__.__print_pool_of_accounts(pool_account=__accounts,
                                                 header='credit operation:')
 
-    def test_003_debit_account(self):
+    def test_003_debit_accounts(self):
         __accounts = self.__class__.__accounts_for_activation
 
         for item_account in __accounts[2:]:
@@ -76,7 +80,7 @@ class TestAccount(unittest.TestCase):
         self.__class__.__print_pool_of_accounts(pool_account=__accounts,
                                                 header='debit operation:')
 
-    def test_004_close_account(self):
+    def test_004_close_accounts(self):
         __accounts = self.__class__.__accounts_for_activation
 
         for item_account in __accounts:
@@ -90,17 +94,40 @@ class TestAccount(unittest.TestCase):
         self.__class__.__print_pool_of_accounts(pool_account=__accounts,
                                                 header='close of accounts:')
 
-    def test_005_raw_json_view(self):
+    def test_005_raw_json_view_of_accounts(self):
         for item_account in self.__class__.__accounts:
             _jsons = item_account.raw_jsons
             _jsons_sample = json.dumps([1, 2, 3])
             self.assertTrue(issubclass(type(_jsons), type(_jsons_sample)))
 
-    def test_006_json_view(self):
+    def test_006_json_view_of_accounts(self):
         for item_account in self.__class__.__accounts:
             _jsons = item_account.jsons
             _jsons_sample = json.dumps([1, 2, 3])
             self.assertTrue(issubclass(type(_jsons), type(_jsons_sample)))
+
+
+class TestAccounts(unittest.TestCase):
+    __number_of_accounts = range(10)
+    __number_collection_of_accounts = range(3)
+    __accounts = None
+    __collection_of_accounts = []
+
+    @classmethod
+    def setUpClass(cls):
+        cls.__accounts = [Account()  for _ in cls.__number_of_accounts]
+
+        for _ in cls.__number_collection_of_accounts:
+            account = cls.__accounts.pop()
+            cls.__collection_of_accounts.append(Accounts(accounts=(account,)
+                                                                    ,primary_id=account.internal_id))
+
+
+    def test_000_create_accounts(self):
+        pass
+
+    def test_001_create_collections(self):
+        pass
 
 
 if __name__ == '__main__':
