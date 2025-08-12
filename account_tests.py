@@ -129,6 +129,8 @@ class TestAccounts(unittest.TestCase):
     def test_001_create_collections_of_accounts(self):
         pass
 
+    def test_002_add_account_into_collection(self):
+        pass
 
 if __name__ == '__main__':
     unittest.main()
