@@ -36,15 +36,15 @@ class TestAccount(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.__accounts = tuple((Account()
-                                           for _ in cls.__number_of_accounts))
+                                for _ in cls.__number_of_accounts))
         cls.__account_collection = Accounts(cls.__accounts
-                                                       , primary_id=cls.__accounts[0].account_id)
+                                            , primary_id=cls.__accounts[0].account_id)
 
         cls.__slice_of_pool = slice(0, int(len(cls.__accounts) / 2))
         cls.__accounts_for_activation = cls.__accounts[cls.__slice_of_pool]
 
         cls.__print_pool_of_accounts(pool_account=cls.__accounts,
-                                                header='pool of accounts:')
+                                     header='pool of accounts:')
 
     def test_000_create_accounts(self):
         pass
@@ -115,13 +115,12 @@ class TestAccounts(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        cls.__accounts = [Account()  for _ in cls.__number_of_accounts]
+        cls.__accounts = [Account() for _ in cls.__number_of_accounts]
 
         for _ in cls.__number_collection_of_accounts:
             account = cls.__accounts.pop()
             cls.__collection_of_accounts.append(Accounts(accounts=(account,)
-                                                                    ,primary_id=account.internal_id))
-
+                                                         , primary_id=account.internal_id))
 
     def test_000_create_accounts(self):
         pass
@@ -131,6 +130,18 @@ class TestAccounts(unittest.TestCase):
 
     def test_002_add_account_into_collection(self):
         pass
+
+    def test_003_get_all_account_in_collection(self):
+        for item_accounts in self.__class__.__collection_of_accounts:
+            for item_account in item_accounts:
+                pass
+
+    def test_004_json_view_of_accounts(self):
+        for item_accounts in self.__class__.__collection_of_accounts:
+            _jsons = item_accounts.jsons
+            _jsons_sample = json.dumps([1, 2, 3])
+            self.assertTrue(issubclass(type(_jsons), type(_jsons_sample)))
+
 
 if __name__ == '__main__':
     unittest.main()

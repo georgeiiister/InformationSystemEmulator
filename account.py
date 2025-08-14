@@ -25,6 +25,7 @@ from error_of_account import PrimaryAccountNotFoundError
 
 from state import Factory as StateFactory
 
+
 class Account(ISObject):
     """Main class for creation account"""
 
@@ -52,10 +53,10 @@ class Account(ISObject):
     @classmethod
     def category_of_account(cls) -> dict:
         return {
-                cls.__active_account: 'active',
-                cls.__passive_account: 'passive',
-                cls.__active_passive_account: 'active_passive'
-                }
+            cls.__active_account: 'active',
+            cls.__passive_account: 'passive',
+            cls.__active_passive_account: 'active_passive'
+        }
 
     def __init__(
             self,
@@ -175,9 +176,9 @@ class Account(ISObject):
 
         if self.balance != 0:
             _exception = BalanceIsNotZero(f'The account {self.account_number}({self.internal_id})'
-                                       f' cannot be closed because the '
-                                       f'account balance is greater than zero')
-            self.error(msg = _exception)
+                                          f' cannot be closed because the '
+                                          f'account balance is greater than zero')
+            self.error(msg=_exception)
             raise _exception
 
         state_closed = StateFactory()['closed']
@@ -216,23 +217,20 @@ class Account(ISObject):
     @property
     def dict_view(self):
         return {
-                'account_id': self.internal_id
-                ,'balance': self.balance
-                ,'account_number': self.account_number
-                ,'state_id': self.state_id
-                ,'account_collection': self.__collection
-                ,'describe': self.describe
-                ,'registration_datetime': self.registration_datetime
-                ,'activation_datetime': self.activation_datetime
-                ,'close_datetime': self.close_datetime
-                }
-
-    def __str__(self):
-        return str(self.dict_view)
+            'account_id': self.internal_id
+            , 'balance': self.balance
+            , 'account_number': self.account_number
+            , 'state_id': self.state_id
+            , 'account_collection': self.__collection
+            , 'describe': self.describe
+            , 'registration_datetime': self.registration_datetime
+            , 'activation_datetime': self.activation_datetime
+            , 'close_datetime': self.close_datetime
+        }
 
     @property
     def jsons(self):
-        result = self.dict_view
+        result = self.dict_view.copy()
         result['balance'] = float(result['balance'])
         class_name = result['account_collection'].__class__.__name__
         result['account_collection'] = class_name
@@ -251,7 +249,7 @@ class Account(ISObject):
             result['close_datetime'] = json_time
         except AttributeError:
             pass
-        dumps = json.dumps(result,default=lambda obj: obj.raw_jsons)
+        dumps = json.dumps(result, default=lambda obj: obj.raw_jsons)
         self.info(msg=f'account_json_view={dumps}')
         return dumps
 
@@ -280,14 +278,15 @@ class Accounts(ISObject):
     __internal_generator_account_id = seq.Seq(seq_name='account')
 
     def __init__(
-                    self,
-                    accounts: Iterable[Account],
-                    primary_id: int
-                ):
+            self,
+            accounts: Iterable[Account],
+            primary_id: int
+    ):
 
         ISObject.__init__(self, internal_id=next(Accounts.__internal_generator_id))
 
         self.__accounts: Dict[int, Account] = dict()
+        self.__items = self.__accounts.items()
         self.__accounts_by_id: Dict[Account.internal_id, Account] = dict()
         self.__primary_id_in_collection: Optional[int] = None
 
@@ -306,7 +305,7 @@ class Accounts(ISObject):
             self.__primary_id_in_collection = id_in_collection
 
         # set on account link to this collection
-        account.collection=(self, id_in_collection)
+        account.collection = (self, id_in_collection)
 
     def add_account(self
                     , accounts: Iterable[Account] | Account
@@ -342,10 +341,9 @@ class Accounts(ISObject):
         """Find account by account number"""
         result = []
         for account in self.__accounts.values():
-            if account.account_number ==account_number:
+            if account.account_number == account_number:
                 result.append(account)
         return result
-
 
     def account_by_id_in_collection(self, id_in_collection: int) -> Account:
         """Find account by item id in collection"""
@@ -375,7 +373,6 @@ class Accounts(ISObject):
     def accounts(self) -> Dict[int, Account]:
         return self.__accounts
 
-
     @property
     def pickle(self):
         return self.__accounts_collection_id, pickle.dumps(self)
@@ -383,4 +380,25 @@ class Accounts(ISObject):
     def close(self):
         for item_id in self.__accounts:
             self.__accounts.get(item_id).close()
+
+    @property
+    def dict_view(self):
+        return {
+            'collection_id': self.internal_id
+            , 'accounts': self.accounts
+            , 'primary': self.primary
+        }
+
+    @property
+    def jsons(self):
+        result = self.dict_view.copy()
+        result['accounts'] = {item[0]: item[1].account_number for item in result.get('accounts').items()}
+        result['primary'] = result.get('primary').account_number
+        dumps = json.dumps(result, default=lambda obj: obj.raw_jsons)
+        self.info(msg=f'accounts_json_view={dumps}')
+        return dumps
+
+    def __getitem__(self, item):
+        return tuple(self.__items)[item]
+
 

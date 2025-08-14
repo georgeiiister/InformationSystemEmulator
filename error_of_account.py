@@ -1,5 +1,6 @@
 from error import InformationSystemError
 
+
 class AccountError(InformationSystemError):
     pass
 
@@ -70,6 +71,7 @@ class PrimaryAccountError(AccountsError):
 
 class DeletePrimaryAccountError(PrimaryAccountError):
     pass
+
 
 class PrimaryAccountNotFoundError(PrimaryAccountError):
     pass
